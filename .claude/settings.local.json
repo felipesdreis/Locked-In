@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ionic --version)",
+      "Bash(ng --version)",
+      "Bash(ionic start *)"
+    ]
+  }
+}
