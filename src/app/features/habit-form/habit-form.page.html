@@ -1,0 +1,122 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ editId ? 'Editar Hábito' : 'Novo Hábito' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (form) {
+  <form [formGroup]="form" (ngSubmit)="save()">
+
+    <ion-item [class.field-error]="nameControl.invalid && nameControl.touched">
+      <ion-input
+        label="Nome"
+        labelPlacement="stacked"
+        formControlName="name"
+        placeholder="Ex: Beber água"
+        clearInput
+      ></ion-input>
+    </ion-item>
+    @if (nameControl.touched && nameControl.hasError('required')) {
+      <ion-text color="danger" class="error-msg">
+        <p>Nome é obrigatório</p>
+      </ion-text>
+    }
+    @if (nameControl.touched && nameControl.hasError('maxlength')) {
+      <ion-text color="danger" class="error-msg">
+        <p>Nome deve ter no máximo 50 caracteres</p>
+      </ion-text>
+    }
+
+    <ion-item>
+      <ion-select
+        label="Frequência"
+        labelPlacement="stacked"
+        formControlName="frequencyType"
+        interface="action-sheet"
+        (ionChange)="onFrequencyChange($event)"
+      >
+        @for (opt of frequencyOptions; track opt.value) {
+          <ion-select-option [value]="opt.value">{{ opt.label }}</ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
+    <ion-note class="frequency-hint ion-padding-horizontal">
+      {{ frequencyHint }}
+    </ion-note>
+
+    @if (isCustomFrequency) {
+      <div class="day-picker">
+        <p>Dias da semana</p>
+        <div class="day-chips">
+          @for (day of weekDays; track day.value) {
+            <ion-chip
+              [class.day-selected]="isDaySelected(day.value)"
+              (click)="toggleDay(day.value)"
+            >
+              {{ day.label }}
+            </ion-chip>
+          }
+        </div>
+        @if (form.get('frequencyDays')?.touched && form.get('frequencyDays')?.hasError('noDaySelected')) {
+          <ion-text color="danger" class="error-msg">
+            <p>Selecione pelo menos um dia</p>
+          </ion-text>
+        }
+      </div>
+    }
+
+    @if (isXPerWeek) {
+      <ion-item>
+        <ion-input
+          label="Vezes por semana"
+          labelPlacement="stacked"
+          type="number"
+          formControlName="xPerWeekCount"
+          [min]="1"
+          [max]="7"
+        ></ion-input>
+      </ion-item>
+    }
+
+    <ion-item>
+      <ion-input
+        label="Lembrete (opcional)"
+        labelPlacement="stacked"
+        type="time"
+        formControlName="reminderTime"
+      ></ion-input>
+    </ion-item>
+
+    <div class="icon-picker">
+      <p>Ícone</p>
+      <div class="icon-grid">
+        @for (icon of icons; track icon) {
+          <button type="button" class="icon-btn" [class.selected]="form.value.icon === icon"
+            (click)="form.patchValue({ icon })">{{ icon }}</button>
+        }
+      </div>
+    </div>
+
+    <div class="color-picker">
+      <p>Cor</p>
+      <div class="color-grid">
+        @for (color of colors; track color) {
+          <button type="button" class="color-btn" [class.selected]="form.value.color === color"
+            [style.background]="color" (click)="form.patchValue({ color })">
+            @if (form.value.color === color) {
+              <span class="color-check">✓</span>
+            }
+          </button>
+        }
+      </div>
+    </div>
+
+    <ion-button expand="block" type="submit" [attr.disabled]="!isFormValid ? true : null" class="ion-margin-top">
+      Salvar
+    </ion-button>
+  </form>
+  } </ion-content>

@@ -1,0 +1,35 @@
+<ion-item [routerLink]="['/habit', habit.id]" detail="false" [class.completion-flash]="isFlashing()">
+  <div class="habit-icon" slot="start" [style.background]="habit.color">
+    {{ habit.icon }}
+  </div>
+  <ion-label>
+    <h2>{{ habit.name }}</h2>
+    @if (isXPerWeek) {
+      <ion-note [class.weekly-goal-reached]="weeklyGoalReached">
+        {{ weeklyProgressLabel }}
+      </ion-note>
+      <ion-progress-bar
+        [value]="weeklyProgressRatio"
+        [color]="weeklyGoalReached ? 'success' : 'primary'"
+      ></ion-progress-bar>
+    } @else {
+      <ion-note [class.on-fire]="habit.currentStreak >= 6">{{ streakLabel }}</ion-note>
+    }
+  </ion-label>
+  <ion-button fill="clear" slot="end" [attr.disabled]="isFlashing() ? true : null" [attr.aria-label]="habit.completedToday ? 'Desmarcar conclusão de hoje' : 'Marcar como concluído hoje'" (click)="onToggle($event)">
+    @if (habit.completedToday) {
+      <ion-icon
+        @completionIcon
+        slot="icon-only"
+        name="checkmark-circle"
+        color="primary"
+      ></ion-icon>
+    } @else {
+      <ion-icon
+        slot="icon-only"
+        name="ellipse-outline"
+        color="medium"
+      ></ion-icon>
+    }
+  </ion-button>
+</ion-item>

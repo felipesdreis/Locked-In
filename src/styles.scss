@@ -1,1 +1,91 @@
-/* You can add global styles to this file, and also import other style files */
+@import '@ionic/angular/css/core.css';
+@import '@ionic/angular/css/normalize.css';
+@import '@ionic/angular/css/structure.css';
+@import '@ionic/angular/css/typography.css';
+@import '@ionic/angular/css/display.css';
+@import '@ionic/angular/css/padding.css';
+@import '@ionic/angular/css/float-elements.css';
+@import '@ionic/angular/css/text-alignment.css';
+@import '@ionic/angular/css/text-transformation.css';
+@import '@ionic/angular/css/flex-utils.css';
+
+:root {
+  /* Primary: Basketball Orange — #D84315 on white = 4.82:1 (AA). Dark mode uses lighter variant #FF6F3C on #1e1e1e = 5.12:1 (AA). */
+  --ion-color-primary: #D84315;
+  --ion-color-primary-rgb: 216, 67, 21;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #be3a12;
+  --ion-color-primary-tint: #dc5630;
+
+  --font-brand: 'Bebas Neue', sans-serif;
+  --font-body: 'Inter', 'Roboto', sans-serif;
+
+  /* medium raised from #92949c (3.03:1 on white) to #6e6e6e (5.10:1) — WCAG AA */
+  --ion-color-medium: #6e6e6e;
+  --ion-color-medium-rgb: 110, 110, 110;
+
+  /* danger raised from #eb445a (3.81:1 on white) to #c0392b (5.44:1) — WCAG AA for 12px text */
+  --ion-color-danger: #c0392b;
+  --ion-color-danger-rgb: 192, 57, 43;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #a93226;
+  --ion-color-danger-tint: #c94d42;
+}
+
+ion-title {
+  font-family: var(--font-brand);
+  letter-spacing: 1px;
+}
+
+ion-card-title {
+  font-family: var(--font-brand);
+  letter-spacing: 0.5px;
+}
+
+body.dark {
+  --ion-background-color: #121212;
+  --ion-background-color-rgb: 18, 18, 18;
+  --ion-text-color: #f0f0f0;
+  --ion-text-color-rgb: 240, 240, 240;
+  --ion-color-light: #2a2a2a;
+  --ion-color-light-rgb: 42, 42, 42;
+  /* medium #909090 passes 5.22:1 on card (#1e1e1e) and 5.87:1 on bg (#121212) — keep as-is */
+  --ion-color-medium: #909090;
+  --ion-color-medium-rgb: 144, 144, 144;
+  /* primary #D84315 on card (#1e1e1e) = 3.40:1 — raise to lighter orange for dark surfaces */
+  --ion-color-primary: #FF6F3C;
+  --ion-color-primary-rgb: 255, 111, 60;
+  --ion-color-primary-shade: #e0623a;
+  --ion-color-primary-tint: #ff7d50;
+  /* danger: revert to Ionic default in dark mode — #eb445a passes 4.91:1 on #121212 */
+  --ion-color-danger: #eb445a;
+  --ion-color-danger-rgb: 235, 68, 90;
+  --ion-color-danger-shade: #cf3d50;
+  --ion-color-danger-tint: #ed576b;
+  --ion-item-background: #1e1e1e;
+  --ion-card-background: #1e1e1e;
+  --ion-toolbar-background: #1a1a1a;
+  --ion-tab-bar-background: #1a1a1a;
+  --ion-border-color: #333333;
+  /* Overlay background: used by action-sheet, alert, popover panels.
+     Without this, the MD action-sheet falls back to --ion-background-color (#121212),
+     producing dark text (#262626 via --ion-color-step-850) on a near-black surface. */
+  --ion-overlay-background-color: #1e1e1e;
+  /* step-850 drives --button-color in the MD action-sheet component.
+     In light mode step-850 resolves to #262626 (dark text on white bg — correct).
+     In dark mode Ionic does not invert the step scale automatically, so we must
+     set it to a light value so button labels are readable on #1e1e1e. */
+  --ion-color-step-850: #d9d9d9;
+
+  /* Ionic step-850 not overridden in dark mode causes ion-card-title to be ~#262626 on #1e1e1e (ratio 1.1:1).
+     Force card titles and subtitles to use the proper text color. */
+  ion-card-title {
+    color: var(--ion-text-color);
+  }
+
+  ion-card-subtitle {
+    color: var(--ion-color-medium);
+  }
+}

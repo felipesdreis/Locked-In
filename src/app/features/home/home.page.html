@@ -1,0 +1,50 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Locked In</ion-title>
+    <ion-buttons slot="end">
+      <ion-button aria-label="Como funciona?" (click)="openHowItWorks()">
+        <ion-icon slot="icon-only" name="help-circle-outline"></ion-icon>
+      </ion-button>
+      <ion-button aria-label="Ver hábitos arquivados" routerLink="/archived">
+        <ion-icon slot="icon-only" name="archive-outline"></ion-icon>
+      </ion-button>
+      <ion-button aria-label="Ver analytics" routerLink="/analytics">
+        <ion-icon slot="icon-only" name="stats-chart"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    @for (habit of habits(); track habit.id) {
+      <app-habit-card [habit]="habit" (toggle)="toggleHabit(habit.id)" />
+    } @empty {
+      <div class="empty-state">
+        <span class="empty-illustration">🔒</span>
+        <ion-text color="medium">
+          <h2 class="empty-title">Nenhum hábito ainda</h2>
+          <p class="empty-subtitle">Toque no + para criar o seu primeiro hábito e começar a construir streaks.</p>
+        </ion-text>
+        <ion-button fill="outline" size="small" (click)="openHowItWorks()">
+          <ion-icon slot="start" name="help-circle-outline"></ion-icon>
+          Como funciona?
+        </ion-button>
+      </div>
+    }
+  </ion-list>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button routerLink="/habit/new">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
+
+@if (showOnboarding()) {
+  <app-onboarding-tutorial (dismissed)="onOnboardingDismissed()" />
+}
+
+@if (activeBadge()) {
+  <app-badge-celebration-modal [milestone]="activeBadge()!" (closed)="onBadgeClosed()" />
+}

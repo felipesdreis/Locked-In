@@ -1,0 +1,70 @@
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  text-align: center;
+  padding: 24px;
+  gap: 16px;
+}
+
+.empty-illustration {
+  font-size: 64px;
+  line-height: 1;
+}
+
+.empty-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+/* 14px medium: with corrected --ion-color-medium (#6e6e6e / light, #909090 / dark),
+   ratio is 5.10:1 (light) and 5.87:1 (dark) — passes AA */
+.empty-subtitle {
+  font-size: 14px;
+  margin: 0;
+}
+
+.tips-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 8px 0;
+}
+
+.tip-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.tip-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.tip-text {
+  flex: 1;
+
+  strong {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+
+  p {
+    font-size: 14px;
+    color: var(--ion-color-medium);
+    margin: 0;
+  }
+}
+
+// Lift the FAB above the Android gesture navigation bar.
+// env(safe-area-inset-bottom) resolves to the hardware navbar height on gesture-nav
+// devices and to 0 on devices with physical buttons, so this is safe on all form factors.
+ion-fab {
+  bottom: calc(16px + env(safe-area-inset-bottom));
+}

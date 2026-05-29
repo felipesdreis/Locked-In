@@ -1,0 +1,112 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ habit()?.name }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button aria-label="Editar hábito" [routerLink]="['/habit', habitId(), 'edit']">
+        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+      </ion-button>
+      <ion-button aria-label="Arquivar hábito" (click)="confirmArchive()" color="danger">
+        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (habit(); as h) {
+    <ion-card>
+      <ion-card-header>
+        <div class="habit-hero" [style.background]="h.color">
+          <span class="habit-icon">{{ h.icon }}</span>
+        </div>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col class="stat">
+              <div class="stat-value">{{ h.currentStreak }}</div>
+              <div class="stat-label">Streak atual</div>
+            </ion-col>
+            <ion-col class="stat">
+              <div class="stat-value">{{ h.longestStreak }}</div>
+              <div class="stat-label">Maior streak</div>
+            </ion-col>
+            <ion-col class="stat">
+              <div class="stat-value">{{ h.totalCompletions }}</div>
+              <div class="stat-label">Total</div>
+            </ion-col>
+            <ion-col class="stat">
+              <div class="stat-value">{{ completionRate() }}%</div>
+              <div class="stat-label">Taxa (30d)</div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Share streak button (only when streak >= 7) -->
+    @if (canShare()) {
+      <ion-button expand="block" fill="outline" class="share-btn" (click)="openShareModal()">
+        <ion-icon slot="start" name="share-outline"></ion-icon>
+        Compartilhar 🎯 {{ h.currentStreak }} dias
+      </ion-button>
+    }
+
+    <!-- Calendar with period navigation -->
+    <div class="period-nav">
+      <ion-button fill="clear" size="small" aria-label="Período anterior" (click)="shiftPeriod(1)">
+        <ion-icon slot="icon-only" name="chevron-back-outline"></ion-icon>
+      </ion-button>
+      <span class="period-label">{{ periodLabel() }}</span>
+      <ion-button fill="clear" size="small" aria-label="Próximo período" (click)="shiftPeriod(-1)" [attr.disabled]="!canGoForward() ? true : null">
+        <ion-icon slot="icon-only" name="chevron-forward-outline"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="calendar-grid">
+      @for (day of periodDays(); track day.toISOString()) {
+        <div class="day-cell" [class.completed]="isCompleted(day)" [style.--color]="h.color">
+          <span class="day-label">{{ day.getDate() }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Conquistas -->
+    @if (h.badge7Days || h.badge30Days || h.badge100Days) {
+      <div class="achievements-section">
+        <h3 class="achievements-title">Conquistas</h3>
+        <div class="achievements-list">
+          @if (h.badge7Days) {
+            <div class="achievement-badge">
+              <span class="achievement-emoji">🌟</span>
+              <span class="achievement-label">7 dias</span>
+            </div>
+          }
+          @if (h.badge30Days) {
+            <div class="achievement-badge">
+              <span class="achievement-emoji">🏆</span>
+              <span class="achievement-label">30 dias</span>
+            </div>
+          }
+          @if (h.badge100Days) {
+            <div class="achievement-badge">
+              <span class="achievement-emoji">💎</span>
+              <span class="achievement-label">100 dias</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</ion-content>
+
+@if (showShareModal() && habit()) {
+  <app-share-preview-modal
+    [habit]="habit()!"
+    [streakDays]="habit()!.currentStreak"
+    (closed)="onShareClosed()"
+  />
+}

@@ -1,12 +1,18 @@
 {
   "name": "locked-in",
-  "version": "0.0.0",
+  "version": "1.1.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:android": "ng build && npx cap sync android",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:single": "ng test --include='**/*.spec.ts' --no-watch",
+    "android": "npx cap open android",
+    "cap:sync": "npx cap sync",
+    "cap:copy": "npx cap copy android",
+    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {
@@ -18,6 +24,18 @@
     "@angular/platform-browser": "^17.3.0",
     "@angular/platform-browser-dynamic": "^17.3.0",
     "@angular/router": "^17.3.0",
+    "@capacitor-community/sqlite": "^7.0.3",
+    "@capacitor/android": "^7.6.5",
+    "@capacitor/cli": "^7.6.5",
+    "@capacitor/core": "^7.6.5",
+    "@capacitor/filesystem": "^7.1.8",
+    "@capacitor/haptics": "^7.0.5",
+    "@capacitor/local-notifications": "^7.0.6",
+    "@capacitor/share": "^7.0.4",
+    "@ionic/angular": "^7.8.6",
+    "@ionic/angular-toolkit": "^11.0.1",
+    "ionicons": "^8.0.13",
+    "jeep-sqlite": "^2.8.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"
@@ -26,6 +44,7 @@
     "@angular-devkit/build-angular": "^17.3.17",
     "@angular/cli": "^17.3.17",
     "@angular/compiler-cli": "^17.3.0",
+    "@capacitor/assets": "^3.0.5",
     "@types/jasmine": "~5.1.0",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
@@ -33,6 +52,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "playwright": "^1.60.0",
     "typescript": "~5.4.2"
   }
 }

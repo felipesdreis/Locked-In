@@ -1,0 +1,8 @@
+<div class="badge-overlay" (click)="close()">
+  <div class="badge-card" (click)="$event.stopPropagation()">
+    <div class="badge-emoji">{{ config.emoji }}</div>
+    <h2 class="badge-title">{{ config.title }}</h2>
+    <p class="badge-message">{{ config.message }}</p>
+    <ion-button expand="block" (click)="close()">Fechar</ion-button>
+  </div>
+</div>

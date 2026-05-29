@@ -1,0 +1,96 @@
+.field-error {
+  --highlight-color-focused: var(--ion-color-danger);
+  --border-color: var(--ion-color-danger);
+}
+
+.error-msg {
+  padding: 4px 16px 0;
+  display: block;
+
+  /* 12px → 13px: below 12px is problematic on mobile; danger color now #c0392b (5.44:1 on white) */
+  p { margin: 0; font-size: 13px; }
+}
+
+.frequency-hint {
+  display: block;
+  /* 12px → 13px for legibility; medium now #6e6e6e (5.10:1 on white) — passes AA */
+  font-size: 13px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  color: var(--ion-color-medium);
+}
+
+.day-picker {
+  padding: 12px 16px;
+
+  p { margin: 0 0 8px; font-weight: 600; }
+}
+
+.day-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  ion-chip {
+    --background: var(--ion-color-light);
+    --color: var(--ion-text-color);
+    margin: 0;
+    cursor: pointer;
+
+    &.day-selected {
+      --background: var(--ion-color-primary);
+      --color: var(--ion-color-primary-contrast);
+    }
+  }
+}
+
+.icon-picker, .color-picker {
+  padding: 12px 16px;
+
+  p { margin: 0 0 8px; font-weight: 600; }
+}
+
+.icon-grid, .color-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.icon-btn {
+  font-size: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: var(--ion-color-light);
+  cursor: pointer;
+
+  &.selected {
+    border-color: var(--ion-color-primary);
+    background: color-mix(in srgb, var(--ion-color-primary) 15%, transparent);
+    box-shadow: 0 0 0 2px var(--ion-color-primary);
+  }
+}
+
+.color-btn {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.selected { border-color: var(--ion-text-color); }
+}
+
+.color-check {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}

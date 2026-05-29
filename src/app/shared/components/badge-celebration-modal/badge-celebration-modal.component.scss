@@ -1,0 +1,51 @@
+.badge-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 200ms ease-out;
+}
+
+.badge-card {
+  background: var(--ion-background-color, #fff);
+  border-radius: 20px;
+  padding: 40px 28px 32px;
+  text-align: center;
+  width: 100%;
+  max-width: 320px;
+  animation: scaleIn 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.badge-emoji {
+  font-size: 64px;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.badge-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ion-text-color);
+  margin: 0 0 12px;
+}
+
+.badge-message {
+  font-size: 15px;
+  color: var(--ion-color-medium);
+  line-height: 1.5;
+  margin: 0 0 24px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

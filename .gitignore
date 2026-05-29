@@ -40,3 +40,22 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Internal documentation (only README.md goes to git)
+/*.md
+!README.md
+
+# Marketing and pitch files
+/pitch-deck.html
+/landing-page.html
+
+# Local build scripts and test utilities
+/build-apk.bat
+/screenshot_script3.mjs
+/test-ui5.mjs
+
+# Test artifacts
+/test-screenshots/
+
+# Claude AI config and memory
+.claude/

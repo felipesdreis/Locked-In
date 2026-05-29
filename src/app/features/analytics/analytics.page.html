@@ -1,0 +1,177 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Analytics</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- Locked In % — métrica principal da marca -->
+  <ion-card class="stat-card locked-in-card">
+    <ion-card-content>
+      <div class="locked-in-percent">{{ weeklyRate() }}%</div>
+      <div class="locked-in-label">LOCKED IN %</div>
+      <div class="stat-sub">Taxa dos últimos 7 dias</div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Summary cards -->
+  <ion-grid class="summary-grid">
+    <ion-row>
+      <ion-col size="6">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <div class="stat-number">{{ todayRate() }}%</div>
+            <div class="stat-desc">Hoje</div>
+            <div class="stat-sub">{{ completedTodayCount() }}/{{ totalHabits() }} hábitos</div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="6">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <div class="stat-number">{{ totalHabits() }}</div>
+            <div class="stat-desc">Hábitos</div>
+            <div class="stat-sub">{{ totalCompletions() }} completions</div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- ISSUE 010 — At-risk habits: only shown when there are habits with streak < 3 -->
+  @if (habitsAtRisk().length > 0) {
+    <ion-card class="at-risk-card">
+      <ion-card-content>
+        <div class="section-label">Em risco</div>
+        <ion-list lines="none">
+          @for (habit of habitsAtRisk(); track habit.id) {
+            <ion-item class="at-risk-item">
+              <span slot="start" class="at-risk-icon">{{ habit.icon }}</span>
+              <ion-label>
+                <h3>{{ habit.name }}</h3>
+              </ion-label>
+              <div slot="end" class="at-risk-streak">
+                @if (habit.currentStreak === 0) {
+                  <span class="at-risk-never">Nunca completado</span>
+                } @else {
+                  <span>{{ habit.currentStreak }} 🔥</span>
+                }
+              </div>
+            </ion-item>
+          }
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+  }
+
+  <!-- Top Streaks -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Maiores streaks ativos</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list lines="none">
+        @for (habit of topStreaks(); track habit.id) {
+          <ion-item>
+            <span slot="start" style="font-size: 24px">{{ habit.icon }}</span>
+            <ion-label>
+              <h3>{{ habit.name }}</h3>
+              <p>Maior: {{ habit.longestStreak }} dias</p>
+            </ion-label>
+            <div slot="end" class="streak-badge">{{ habit.currentStreak }} 🔥</div>
+          </ion-item>
+        } @empty {
+          <p class="empty-msg">Nenhum hábito ainda.</p>
+        }
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Weekly bar chart -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Completions por dia da semana</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      @if (totalCompletions() === 0) {
+        <p class="empty-msg">Complete hábitos para ver o gráfico.</p>
+      } @else {
+        <div class="bar-chart">
+          @for (bar of weekdayBars(); track bar.label) {
+            <div class="bar-col">
+              <span class="bar-count">{{ bar.count }}</span>
+              <div class="bar-fill" [style.height.px]="bar.heightPx"></div>
+              <span class="bar-label">{{ bar.label }}</span>
+            </div>
+          }
+        </div>
+      }
+    </ion-card-content>
+  </ion-card>
+
+  <!-- 30-day heatmap -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Últimos 30 dias</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      @if (totalCompletions() === 0) {
+        <p class="empty-msg">Nenhuma completion registrada.</p>
+      } @else {
+        <div class="heatmap">
+          @for (day of heatmapDays(); track day.date) {
+            <div class="heat-cell" [ngClass]="day.intensity" [title]="day.date + ': ' + day.count">
+              <span class="heat-label">{{ day.day }}</span>
+            </div>
+          }
+        </div>
+      }
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Per-habit table — ISSUE 005: frequency-aware weekly rate -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Por hábito</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      @if (habitsTable().length === 0) {
+        <p class="empty-msg">Nenhum hábito ainda.</p>
+      } @else {
+        <table class="habit-table">
+          <thead>
+            <tr>
+              <th>Hábito</th>
+              <th>Streak</th>
+              <th>Maior</th>
+              <th>Semana</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (h of habitsTable(); track h.id) {
+              <tr>
+                <td class="habit-name-col">
+                  <span class="habit-icon-sm">{{ h.icon }}</span>
+                  <span class="habit-name-text">{{ h.name }}</span>
+                </td>
+                <td>{{ h.currentStreak }}🔥</td>
+                <td>{{ h.longestStreak }}</td>
+                <td class="weekly-rate-col">
+                  <span class="weekly-fraction">
+                    {{ h.actualWeeklyRate.done }}/{{ h.actualWeeklyRate.denominator }}
+                  </span>
+                  <span class="weekly-percent">({{ h.actualWeeklyRate.percent }}%)</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>
