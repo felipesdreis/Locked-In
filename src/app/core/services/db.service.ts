@@ -83,4 +83,35 @@ export class DbService {
       await this.sqlite.saveToStore(DB_NAME);
     }
   }
+
+  async exportAsJSON(): Promise<Blob> {
+    const habits = await this.query<Record<string, string>>('SELECT * FROM habits ORDER BY created_at ASC');
+    const completions = await this.query<Record<string, string>>('SELECT * FROM completions ORDER BY completed_at ASC');
+
+    const data = {
+      version: '1.0',
+      exportedAt: new Date().toISOString(),
+      habits: habits.map(h => ({
+        id: h['id'],
+        name: h['name'],
+        icon: h['icon'],
+        color: h['color'],
+        frequencyType: h['frequency_type'],
+        frequencyDays: JSON.parse(h['frequency_days'] ?? '[]'),
+        reminderTime: h['reminder_time'] ?? null,
+        createdAt: h['created_at'],
+        archivedAt: h['archived_at'] ?? null,
+        badge7Days: h['badge_7_days'] === '1',
+        badge30Days: h['badge_30_days'] === '1',
+        badge100Days: h['badge_100_days'] === '1',
+      })),
+      completions: completions.map(c => ({
+        id: c['id'],
+        habitId: c['habit_id'],
+        completedAt: c['completed_at'],
+      })),
+    };
+
+    return new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  }
 }

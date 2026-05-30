@@ -8,7 +8,7 @@ import {
 import { HabitService } from '../../core/services/habit.service';
 import {
   toDateString, subtractDays, parseDateString,
-  currentIsoWeekDates,
+  currentIsoWeekDates, getLast,
 } from '../../core/utils/date.util';
 
 @Component({
@@ -87,24 +87,23 @@ export class AnalyticsPage implements OnInit {
   });
 
   // Last 30 days heatmap: total completions per day across all habits
+  // Intensity uses absolute thresholds: 0=none, 1-2=low, 3-4=mid, 5+=high
   readonly heatmapDays = computed(() => {
     const map = new Map<string, number>();
     for (const c of this.completions()) {
       map.set(c.completedAt, (map.get(c.completedAt) ?? 0) + 1);
     }
-    const maxVal = Math.max(...Array.from(map.values()), 1);
     const today = new Date();
     return Array.from({ length: 30 }, (_, i) => {
       const d = subtractDays(today, 29 - i);
       const ds = toDateString(d);
       const count = map.get(ds) ?? 0;
-      const ratio = count / maxVal;
-      const intensity = count === 0 ? '' : ratio < 0.34 ? 'low' : ratio < 0.67 ? 'mid' : 'high';
+      const intensity = count === 0 ? '' : count <= 2 ? 'low' : count <= 4 ? 'mid' : 'high';
       return { date: ds, count, day: d.getDate(), intensity };
     });
   });
 
-  // ISSUE 005 — Per-habit table with frequency-aware weekly rate
+  // ISSUE 005 — Per-habit table with frequency-aware weekly rate + overall completion rate
   readonly habitsTable = computed(() => {
     const completions = this.completions();
     const today = new Date();
@@ -122,9 +121,52 @@ export class AnalyticsPage implements OnInit {
         const actualWeeklyRate = this.computeWeeklyRate(
           h, habitCompletions, last7Dates, last7Set, isoWeekSet,
         );
-        return { ...h, actualWeeklyRate };
+        const overallRate = this.computeOverallRate(h, habitCompletions, today);
+        return { ...h, actualWeeklyRate, overallRate };
       });
   });
+
+  // Overall completion rate: total completions / total scheduled days since creation
+  private computeOverallRate(
+    habit: { createdAt: string; frequencyType: string; frequencyDays: number[] },
+    habitCompletions: { completedAt: string }[],
+    today: Date,
+  ): number {
+    const createdDate = parseDateString(habit.createdAt.substring(0, 10));
+    const msPerDay = 86_400_000;
+    const daysSinceCreation = Math.max(Math.floor((today.getTime() - createdDate.getTime()) / msPerDay) + 1, 1);
+
+    let scheduledDays: number;
+    switch (habit.frequencyType) {
+      case 'daily':
+        scheduledDays = daysSinceCreation;
+        break;
+      case 'weekdays':
+        scheduledDays = getLast(daysSinceCreation, 'days')
+          .filter(d => { const dow = d.getDay(); return dow >= 1 && dow <= 5; }).length;
+        break;
+      case 'weekends':
+        scheduledDays = getLast(daysSinceCreation, 'days')
+          .filter(d => { const dow = d.getDay(); return dow === 0 || dow === 6; }).length;
+        break;
+      case 'custom': {
+        const scheduled = new Set(habit.frequencyDays);
+        scheduledDays = getLast(daysSinceCreation, 'days')
+          .filter(d => scheduled.has(d.getDay())).length;
+        break;
+      }
+      case 'x_per_week': {
+        const weeksElapsed = Math.ceil(daysSinceCreation / 7);
+        scheduledDays = weeksElapsed * (habit.frequencyDays[0] ?? 1);
+        break;
+      }
+      default:
+        scheduledDays = daysSinceCreation;
+    }
+
+    if (scheduledDays === 0) return 0;
+    return Math.min(Math.round((habitCompletions.length / scheduledDays) * 100), 100);
+  }
 
   // Computes done/denominator fraction and percent for a single habit based on its frequency type
   private computeWeeklyRate(

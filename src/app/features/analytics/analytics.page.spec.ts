@@ -197,4 +197,99 @@ describe('AnalyticsPage', () => {
       expect(component.weeklyRateDetails().rate).toBe(100);
     });
   });
+
+  // ── heatmapDays intensity ────────────────────────────────────────────────────
+
+  describe('heatmapDays', () => {
+    it('returns empty string intensity for days with 0 completions', async () => {
+      await setup([], []);
+      const days = component.heatmapDays();
+      expect(days.every(d => d.intensity === '')).toBeTrue();
+    });
+
+    it('uses "low" intensity for 1-2 completions on a day', async () => {
+      const today = new Date();
+      const todayStr = toDateString(today);
+      const completions: Completion[] = [
+        { id: 'c1', habitId: 'h1', completedAt: todayStr },
+        { id: 'c2', habitId: 'h2', completedAt: todayStr },
+      ];
+      await setup([], completions);
+      const todayCell = component.heatmapDays().find(d => d.date === todayStr)!;
+      expect(todayCell.intensity).toBe('low');
+      expect(todayCell.count).toBe(2);
+    });
+
+    it('uses "mid" intensity for 3-4 completions on a day', async () => {
+      const today = new Date();
+      const todayStr = toDateString(today);
+      const completions: Completion[] = Array.from({ length: 3 }, (_, i) => ({
+        id: `c${i}`, habitId: `h${i}`, completedAt: todayStr,
+      }));
+      await setup([], completions);
+      const todayCell = component.heatmapDays().find(d => d.date === todayStr)!;
+      expect(todayCell.intensity).toBe('mid');
+    });
+
+    it('uses "high" intensity for 5+ completions on a day', async () => {
+      const today = new Date();
+      const todayStr = toDateString(today);
+      const completions: Completion[] = Array.from({ length: 5 }, (_, i) => ({
+        id: `c${i}`, habitId: `h${i}`, completedAt: todayStr,
+      }));
+      await setup([], completions);
+      const todayCell = component.heatmapDays().find(d => d.date === todayStr)!;
+      expect(todayCell.intensity).toBe('high');
+    });
+
+    it('returns exactly 30 days', async () => {
+      await setup([], []);
+      expect(component.heatmapDays().length).toBe(30);
+    });
+  });
+
+  // ── overallRate in habitsTable ───────────────────────────────────────────────
+
+  describe('habitsTable overallRate', () => {
+    it('daily: 100% when completed every day since creation', async () => {
+      const today = new Date();
+      const todayStr = toDateString(today);
+      // Created 7 days ago
+      const createdDate = subtractDays(today, 6);
+      const createdAt = createdDate.toISOString();
+      const h1 = makeHabit({ id: 'h1', frequencyType: 'daily', createdAt });
+      // 7 completions, one per day
+      const completions: Completion[] = Array.from({ length: 7 }, (_, i) => ({
+        id: `c${i}`,
+        habitId: 'h1',
+        completedAt: toDateString(subtractDays(today, 6 - i)),
+      }));
+      await setup([h1], completions);
+      const row = component.habitsTable().find(r => r.id === 'h1')!;
+      expect(row.overallRate).toBe(100);
+    });
+
+    it('daily: ~50% when completed half the days since creation', async () => {
+      const today = new Date();
+      const createdDate = subtractDays(today, 9); // 10 days ago
+      const createdAt = createdDate.toISOString();
+      const h1 = makeHabit({ id: 'h1', frequencyType: 'daily', createdAt });
+      // 5 completions out of 10 days
+      const completions: Completion[] = Array.from({ length: 5 }, (_, i) => ({
+        id: `c${i}`,
+        habitId: 'h1',
+        completedAt: toDateString(subtractDays(today, i)),
+      }));
+      await setup([h1], completions);
+      const row = component.habitsTable().find(r => r.id === 'h1')!;
+      expect(row.overallRate).toBe(50);
+    });
+
+    it('is 0% when habit has no completions', async () => {
+      const h1 = makeHabit({ id: 'h1', frequencyType: 'daily', createdAt: subtractDays(new Date(), 5).toISOString() });
+      await setup([h1], []);
+      const row = component.habitsTable().find(r => r.id === 'h1')!;
+      expect(row.overallRate).toBe(0);
+    });
+  });
 });

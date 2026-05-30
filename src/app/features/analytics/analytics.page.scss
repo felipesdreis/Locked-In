@@ -129,25 +129,17 @@
   }
 
   &.low {
-    background: rgba(216, 67, 21, 0.25);
-    .heat-label { color: #7a1c06; }
-  }
-
-  body.dark &.low {
-    .heat-label { color: #f0f0f0; }
+    background: #c6e48b;
+    .heat-label { color: #2d6a2a; }
   }
 
   &.mid {
-    background: rgba(216, 67, 21, 0.55);
-    .heat-label { color: rgba(0, 0, 0, 0.85); }
-  }
-
-  body.dark &.mid {
-    .heat-label { color: #f0f0f0; }
+    background: #7bc96f;
+    .heat-label { color: #1a4d18; }
   }
 
   &.high {
-    background: var(--ion-color-primary);
+    background: #239a3b;
     .heat-label { color: #fff; }
   }
 }
@@ -197,20 +189,11 @@
   font-style: italic;
 }
 
-// --- ISSUE 005: Weekly rate fraction display in table ---
-.weekly-rate-col {
-  white-space: nowrap;
-}
-
-.weekly-fraction {
+// --- Overall completion rate column ---
+.overall-rate-col {
   font-weight: 600;
   font-size: 13px;
-}
-
-.weekly-percent {
-  font-size: 11px;
-  color: var(--ion-color-medium);
-  margin-left: 2px;
+  white-space: nowrap;
 }
 
 // --- Per-habit table ---

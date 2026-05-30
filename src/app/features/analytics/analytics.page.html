@@ -148,7 +148,7 @@
               <th>Hábito</th>
               <th>Streak</th>
               <th>Maior</th>
-              <th>Semana</th>
+              <th>Taxa</th>
             </tr>
           </thead>
           <tbody>
@@ -160,12 +160,7 @@
                 </td>
                 <td>{{ h.currentStreak }}🔥</td>
                 <td>{{ h.longestStreak }}</td>
-                <td class="weekly-rate-col">
-                  <span class="weekly-fraction">
-                    {{ h.actualWeeklyRate.done }}/{{ h.actualWeeklyRate.denominator }}
-                  </span>
-                  <span class="weekly-percent">({{ h.actualWeeklyRate.percent }}%)</span>
-                </td>
+                <td class="overall-rate-col">{{ h.overallRate }}%</td>
               </tr>
             }
           </tbody>

@@ -5,7 +5,7 @@ import {
   IonIcon, IonList, IonButton, IonButtons, IonText,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, statsChart, archiveOutline, helpCircleOutline } from 'ionicons/icons';
+import { add, statsChart, archiveOutline, helpCircleOutline, settingsOutline } from 'ionicons/icons';
 import { HabitService, BadgeMilestone } from '../../core/services/habit.service';
 import { HabitCardComponent } from '../../shared/components/habit-card/habit-card.component';
 import { OnboardingTutorialComponent, ONBOARDING_DONE_KEY } from '../onboarding/onboarding-tutorial.component';
@@ -38,7 +38,7 @@ export class HomePage implements OnInit {
   );
 
   constructor(private habitService: HabitService) {
-    addIcons({ add, statsChart, archiveOutline, helpCircleOutline });
+    addIcons({ add, statsChart, archiveOutline, helpCircleOutline, settingsOutline });
   }
 
   async ngOnInit(): Promise<void> {

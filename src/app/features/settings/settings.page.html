@@ -1,0 +1,67 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Configurações</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- Dados -->
+  <div class="section-header">Dados</div>
+  <ion-list inset="true">
+    <ion-item button (click)="exportData()" [disabled]="exporting()">
+      <ion-icon slot="start" name="cloud-download-outline"></ion-icon>
+      <ion-label>
+        <h3>Exportar backup</h3>
+        <p>Baixar seus hábitos em JSON para backup pessoal</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <!-- Sobre -->
+  <div class="section-header">Sobre o app</div>
+  <ion-list inset="true">
+    <ion-item>
+      <ion-label>
+        <h3>Locked In</h3>
+        <p>100% privado, sem conta, sempre offline</p>
+      </ion-label>
+      <ion-note slot="end">v{{ appVersion }}</ion-note>
+    </ion-item>
+  </ion-list>
+
+  <!-- Feedback -->
+  <div class="section-header">Feedback</div>
+  <ion-list inset="true">
+    <ion-item button (click)="openFeedback()">
+      <ion-icon slot="start" name="mail-outline"></ion-icon>
+      <ion-label>
+        <h3>Enviar feedback</h3>
+        <p>Encontrou um bug? Tem sugestão? Mande um e-mail</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <!-- Links -->
+  <div class="section-header">Links</div>
+  <ion-list inset="true">
+    <ion-item button (click)="openLink('https://github.com/felipereis755/Locked-In')">
+      <ion-icon slot="start" name="logo-github"></ion-icon>
+      <ion-label>
+        <h3>GitHub</h3>
+        <p>Código-fonte do projeto</p>
+      </ion-label>
+    </ion-item>
+    <ion-item button (click)="openLink('https://streaksapp.com')">
+      <ion-icon slot="start" name="information-circle-outline"></ion-icon>
+      <ion-label>
+        <h3>Inspiração: Streaks</h3>
+        <p>O app que inspirou o Locked In</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+</ion-content>

@@ -117,4 +117,66 @@ describe('DbService', () => {
       expect(mockDbConnection.run).toHaveBeenCalledWith('DELETE FROM completions', []);
     });
   });
+
+  describe('exportAsJSON()', () => {
+    const fakeHabit = {
+      id: 'h1', name: 'Run', icon: '🏃', color: '#ff0000',
+      frequency_type: 'daily', frequency_days: '[]',
+      reminder_time: null, created_at: '2026-01-01T00:00:00.000Z',
+      archived_at: null,
+      badge_7_days: '0', badge_30_days: '0', badge_100_days: '0',
+    };
+    const fakeCompletion = { id: 'c1', habit_id: 'h1', completed_at: '2026-01-01' };
+
+    beforeEach(async () => {
+      await service.initialize();
+    });
+
+    it('returns a valid JSON Blob with habits and completions', async () => {
+      mockDbConnection.query.and.callFake(async (sql: string) => {
+        if (sql.includes('FROM habits')) return { values: [fakeHabit] };
+        if (sql.includes('FROM completions')) return { values: [fakeCompletion] };
+        return { values: [] };
+      });
+
+      const blob = await service.exportAsJSON();
+      expect(blob).toBeInstanceOf(Blob);
+      expect(blob.type).toBe('application/json');
+
+      const text = await blob.text();
+      const parsed = JSON.parse(text);
+      expect(parsed['version']).toBe('1.0');
+      expect(parsed['exportedAt']).toBeTruthy();
+      expect(parsed['habits'].length).toBe(1);
+      expect(parsed['habits'][0]['id']).toBe('h1');
+      expect(parsed['completions'].length).toBe(1);
+      expect(parsed['completions'][0]['habitId']).toBe('h1');
+    });
+
+    it('returns empty arrays when no data exists', async () => {
+      mockDbConnection.query.and.resolveTo({ values: [] });
+
+      const blob = await service.exportAsJSON();
+      const text = await blob.text();
+      const parsed = JSON.parse(text);
+
+      expect(parsed['habits']).toEqual([]);
+      expect(parsed['completions']).toEqual([]);
+    });
+
+    it('includes archived habits in the export', async () => {
+      const archivedHabit = { ...fakeHabit, id: 'h2', archived_at: '2026-03-01T00:00:00.000Z' };
+      mockDbConnection.query.and.callFake(async (sql: string) => {
+        if (sql.includes('FROM habits')) return { values: [fakeHabit, archivedHabit] };
+        return { values: [] };
+      });
+
+      const blob = await service.exportAsJSON();
+      const text = await blob.text();
+      const parsed = JSON.parse(text);
+
+      expect(parsed['habits'].length).toBe(2);
+      expect(parsed['habits'][1]['archivedAt']).toBe('2026-03-01T00:00:00.000Z');
+    });
+  });
 });

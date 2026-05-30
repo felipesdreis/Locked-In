@@ -30,5 +30,9 @@ export const routes: Routes = [
     path: 'archived',
     loadComponent: () => import('./features/archived-habits/archived-habits.page').then(m => m.ArchivedHabitsPage),
   },
+  {
+    path: 'settings',
+    loadComponent: () => import('./features/settings/settings.page').then(m => m.SettingsPage),
+  },
   { path: '**', redirectTo: 'home' },
 ];
