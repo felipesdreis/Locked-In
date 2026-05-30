@@ -52,11 +52,11 @@
             android:textColor="#D84315"
             android:includeFontPadding="false" />
 
+        <!-- BUG-001: sem android:src — bitmap setado via setImageViewBitmap() no Java -->
         <ImageView
             android:id="@+id/widget_check"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:src="@drawable/widget_check"
             android:visibility="gone" />
 
         <TextView
@@ -73,10 +73,10 @@
             android:layout_marginTop="2dp" />
     </LinearLayout>
 
-    <!-- Progress bar -->
+    <!-- BUG-002: style estático, sem referência de tema -->
     <ProgressBar
         android:id="@+id/widget_progress"
-        style="?android:attr/progressBarStyleHorizontal"
+        style="@android:style/Widget.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="3dp"
         android:max="100"
