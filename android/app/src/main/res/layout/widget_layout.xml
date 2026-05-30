@@ -1,40 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 2x2 Shot Clock widget -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
     android:background="@drawable/widget_background"
-    android:padding="12dp">
+    android:padding="14dp">
 
-    <TextView
-        android:id="@+id/widget_count"
-        android:layout_width="wrap_content"
+    <!-- Header: LOCKED IN + ring icon -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="--"
-        android:textSize="36sp"
-        android:textStyle="bold"
-        android:textColor="#FFFFFF"
-        android:gravity="center" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/widget_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="hábitos hoje"
-        android:textSize="12sp"
-        android:textColor="#CCFFFFFF"
-        android:gravity="center"
-        android:layout_marginTop="2dp" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="LOCKED IN"
+            android:textSize="9sp"
+            android:fontFamily="sans-serif-condensed"
+            android:textStyle="bold"
+            android:textColor="#F5F5F5"
+            android:alpha="0.7" />
 
-    <TextView
-        android:id="@+id/widget_app_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Locked In"
-        android:textSize="10sp"
-        android:textColor="#99FFFFFF"
-        android:gravity="center"
-        android:layout_marginTop="8dp" />
+        <ImageView
+            android:id="@+id/widget_hoop"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/widget_ring" />
+    </LinearLayout>
+
+    <!-- Center: large number (active) or check icon (game over) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/widget_pending_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00"
+            android:textSize="68sp"
+            android:fontFamily="sans-serif-condensed"
+            android:textStyle="bold"
+            android:textColor="#D84315"
+            android:includeFontPadding="false" />
+
+        <ImageView
+            android:id="@+id/widget_check"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/widget_check"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/widget_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PENDENTES"
+            android:textSize="9sp"
+            android:fontFamily="sans-serif-condensed"
+            android:textStyle="bold"
+            android:textColor="#EBF5F5F5"
+            android:gravity="center"
+            android:maxLines="2"
+            android:layout_marginTop="2dp" />
+    </LinearLayout>
+
+    <!-- Progress bar -->
+    <ProgressBar
+        android:id="@+id/widget_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:max="100"
+        android:progress="0"
+        android:progressDrawable="@drawable/widget_progress_drawable" />
 
 </LinearLayout>
