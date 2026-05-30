@@ -1,6 +1,6 @@
 .locked-in-card {
   margin: 0 0 8px;
-  border-left: 4px solid var(--ion-color-primary);
+  border-left: var(--border-accent);
 
   ion-card-content {
     padding: 16px 20px;
@@ -117,7 +117,8 @@
 .heat-cell {
   aspect-ratio: 1;
   border-radius: 4px;
-  background: var(--ion-color-light);
+  background: var(--color-heat-empty, #1a1a1a);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   display: flex;
   align-items: center;
   justify-content: center;
