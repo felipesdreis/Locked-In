@@ -8,7 +8,7 @@
     android:background="@drawable/widget_background"
     android:padding="12dp">
 
-    <!-- LOCKED IN wordmark -->
+    <!-- LOCKED IN wordmark — alpha baked into textColor (#B2 = 70% opacity) -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -16,8 +16,7 @@
         android:textSize="8sp"
         android:fontFamily="sans-serif-condensed"
         android:textStyle="bold"
-        android:textColor="#F5F5F5"
-        android:alpha="0.7" />
+        android:textColor="#B2F5F5F5" />
 
     <!-- Main content row -->
     <LinearLayout
@@ -66,8 +65,8 @@
                 android:maxLines="2" />
         </LinearLayout>
 
-        <!-- Half-court divider -->
-        <View
+        <!-- Half-court divider — TextView porque View pura pode falhar em RemoteViews -->
+        <TextView
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:background="#2A2A2A"
