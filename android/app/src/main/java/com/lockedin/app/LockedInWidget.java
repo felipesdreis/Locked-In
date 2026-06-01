@@ -18,8 +18,11 @@ import android.widget.RemoteViews;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * 2×2 "Shot Clock" widget — mostra hábitos pendentes ou GAME OVER.
@@ -137,35 +140,41 @@ public class LockedInWidget extends AppWidgetProvider {
             db = SQLiteDatabase.openDatabase(dbFile.getPath(), null, SQLiteDatabase.OPEN_READONLY);
             String today = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
 
-            // Total de hábitos ativos
+            // Dia da semana atual: Calendar retorna 1=Dom..7=Sab → convertemos para 0=Dom..6=Sab
+            int dow = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
+
+            // IDs completados hoje
+            Set<String> completedIds = new HashSet<>();
             try (Cursor c = db.rawQuery(
-                    "SELECT COUNT(*) FROM habits WHERE archived_at IS NULL", null)) {
-                if (c.moveToFirst()) data.total = c.getInt(0);
+                    "SELECT habit_id FROM completions WHERE completed_at = ?",
+                    new String[]{today})) {
+                while (c.moveToNext()) completedIds.add(c.getString(0));
             }
 
-            // BUG-005: contar apenas completions de hábitos ainda ativos
+            // Hábitos ativos com dados de frequência — filtra por dia em Java
+            int pendingIdx = 0;
             try (Cursor c = db.rawQuery(
-                    "SELECT COUNT(*) FROM completions" +
-                    " WHERE completed_at = ?" +
-                    " AND habit_id IN (SELECT id FROM habits WHERE archived_at IS NULL)",
-                    new String[]{today})) {
-                if (c.moveToFirst()) data.completed = c.getInt(0);
-            }
+                    "SELECT id, name, frequency_type, frequency_days" +
+                    " FROM habits WHERE archived_at IS NULL", null)) {
+                while (c.moveToNext()) {
+                    String id       = c.getString(0);
+                    String name     = c.getString(1);
+                    String freqType = c.isNull(2) ? null : c.getString(2);
+                    String freqDays = c.isNull(3) ? null : c.getString(3);
 
-            // Nomes dos hábitos pendentes (até 3) para o widget 4×2
-            try (Cursor c = db.rawQuery(
-                    "SELECT name FROM habits WHERE archived_at IS NULL" +
-                    " AND id NOT IN (SELECT habit_id FROM completions WHERE completed_at = ?)" +
-                    " LIMIT 3",
-                    new String[]{today})) {
-                int idx = 0;
-                while (c.moveToNext() && idx < 3) {
-                    data.pendingNames[idx++] = c.getString(0);
+                    if (!isScheduledForDow(freqType, freqDays, dow)) continue;
+
+                    data.total++;
+                    if (completedIds.contains(id)) {
+                        data.completed++;
+                    } else if (pendingIdx < 3) {
+                        data.pendingNames[pendingIdx++] = name;
+                    }
                 }
             }
 
             data.pending = Math.max(data.total - data.completed, 0);
-            Log.d(TAG, "total=" + data.total + " completed=" + data.completed +
+            Log.d(TAG, "dow=" + dow + " total=" + data.total + " completed=" + data.completed +
                 " pending=" + data.pending);
 
         } catch (Exception e) {
@@ -175,6 +184,26 @@ public class LockedInWidget extends AppWidgetProvider {
             if (db != null) db.close();
         }
         return data;
+    }
+
+    static boolean isScheduledForDow(String freqType, String freqDaysJson, int dow) {
+        if (freqType == null) return true;
+        switch (freqType) {
+            case "daily":      return true;
+            case "x_per_week": return true;
+            case "weekdays":   return dow >= 1 && dow <= 5;
+            case "weekends":   return dow == 0 || dow == 6;
+            case "custom": {
+                if (freqDaysJson == null) return false;
+                String token = String.valueOf(dow);
+                String clean = freqDaysJson.replaceAll("\\s", "");
+                return clean.equals("[" + token + "]")
+                    || clean.startsWith("[" + token + ",")
+                    || clean.endsWith("," + token + "]")
+                    || clean.contains("," + token + ",");
+            }
+            default: return true;
+        }
     }
 
     // BUG-004: tenta múltiplos caminhos e faz scan do diretório de bancos
