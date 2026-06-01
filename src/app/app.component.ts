@@ -3,6 +3,7 @@ import { Location } from '@angular/common';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { Platform, NavController } from '@ionic/angular';
 import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
 import { NotificationService } from './core/services/notification.service';
 
 @Component({
@@ -19,13 +20,15 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.initDarkMode();
-    this.registerBackButton();
 
     // Android 8+ requires a notification channel to exist before scheduling.
     // Safe to call on every init — createChannel is idempotent.
     if (Capacitor.getPlatform() === 'android') {
       this.notifications.createChannel();
     }
+
+    // Platform must be ready before back button events fire on native.
+    this.platform.ready().then(() => this.registerBackButton());
   }
 
   // Priority 10 is below Ionic overlays (modals, alerts use higher priorities),
@@ -33,8 +36,7 @@ export class AppComponent implements OnInit {
   private registerBackButton(): void {
     this.platform.backButton.subscribeWithPriority(10, () => {
       if (this.location.path() === '/home' || this.location.path() === '') {
-        // At root — let Android handle it (minimizes or exits the app).
-        (navigator as Navigator & { app?: { exitApp(): void } }).app?.exitApp();
+        App.exitApp();
       } else {
         this.navController.back();
       }

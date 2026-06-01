@@ -1,0 +1,58 @@
+<app-screen-header title="ARQUIVADOS" [showBack]="true"></app-screen-header>
+
+<ion-content>
+  <div class="archived-container">
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state" *ngIf="isEmpty">
+      <div class="empty-icon-box">
+        <app-icon name="archive" [size]="52" color="var(--faint)"></app-icon>
+      </div>
+      <h2 class="empty-title">BANCO VAZIO</h2>
+      <p class="empty-text">
+        Nenhum hábito arquivado. Hábitos pausados ficam no banco, prontos pra voltar à quadra.
+      </p>
+    </div>
+
+    <!-- LIST -->
+    <div class="archived-list" *ngIf="!isEmpty">
+      <div *ngFor="let habit of archivedHabits()" class="archived-row">
+        <!-- Icon -->
+        <div class="habit-icon">
+          <app-icon [name]="habit.icon" [size]="24" [stroke]="2"></app-icon>
+        </div>
+
+        <!-- Info -->
+        <div class="habit-info">
+          <div class="habit-name">{{ habit.name }}</div>
+          <div class="habit-meta">Arquivado em {{ formatDate(habit.archivedAt) }}</div>
+        </div>
+
+        <!-- Actions -->
+        <div class="habit-actions">
+          <button
+            class="action-btn restore"
+            (click)="restore(habit.id)"
+            type="button"
+            aria-label="Restaurar hábito"
+            title="Restaurar"
+          >
+            <app-icon name="check" [size]="20"></app-icon>
+          </button>
+          <button
+            class="action-btn delete"
+            (click)="confirmDelete(habit)"
+            type="button"
+            aria-label="Deletar hábito permanentemente"
+            title="Excluir permanentemente"
+          >
+            <app-icon name="trash" [size]="20"></app-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom padding -->
+    <div style="height: 32px"></div>
+  </div>
+</ion-content>

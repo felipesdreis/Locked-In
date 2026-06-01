@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
+
 @import '@ionic/angular/css/core.css';
 @import '@ionic/angular/css/normalize.css';
 @import '@ionic/angular/css/structure.css';
@@ -10,6 +12,40 @@
 @import '@ionic/angular/css/flex-utils.css';
 
 :root {
+  /* ============================================================
+   * LOCKED IN v3.0 — Basketball Design System Tokens
+   * ============================================================ */
+
+  /* Core palette */
+  --accent: #D84315;
+  --bg: #121212;
+  --asphalt: #1E1E1E;
+  --asphalt-2: #262626;
+  --white: #F5F5F5;
+
+  /* Semantic alphas */
+  --muted: rgba(245, 245, 245, 0.55);
+  --faint: rgba(245, 245, 245, 0.32);
+  --line: rgba(245, 245, 245, 0.09);
+  --line-strong: rgba(245, 245, 245, 0.20);
+
+  /* Density (default: regular) */
+  --row-pad: 12px;
+  --row-gap: 9px;
+
+  /* Watermark */
+  --court-strength: 0.042;
+
+  /* Typography */
+  --display: 'Bebas Neue', sans-serif;
+  --ui: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Typography helpers */
+  --line-height-tight: 0.82;
+  --letter-spacing-title: 2px;
+  --letter-spacing-label: 1.5px;
+  --letter-spacing-caption: 2.5px;
+
   /* Primary: Basketball Orange — #D84315 on white = 4.82:1 (AA). Dark mode uses lighter variant #FF6F3C on #1e1e1e = 5.12:1 (AA). */
   --ion-color-primary: #D84315;
   --ion-color-primary-rgb: 216, 67, 21;
@@ -42,6 +78,29 @@
   /* brand shorthand tokens */
   --border-accent: 4px solid var(--ion-color-primary);
   --color-heat-empty: #2a2a2a;
+}
+
+/* ============================================================
+ * Density classes — applied to body via settings
+ * ============================================================ */
+.density-compact {
+  --row-pad: 9px;
+  --row-gap: 7px;
+}
+
+.density-comfy {
+  --row-pad: 15px;
+  --row-gap: 12px;
+}
+
+/* ============================================================
+ * Global base — dark-first
+ * ============================================================ */
+html,
+body {
+  font-family: var(--ui);
+  background-color: var(--bg);
+  color: var(--white);
 }
 
 ion-title {

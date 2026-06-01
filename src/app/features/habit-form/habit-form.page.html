@@ -1,122 +1,141 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home"></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ editId ? 'Editar Hábito' : 'Novo Hábito' }}</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-screen-header
+  [title]="editId ? 'EDITAR HÁBITO' : 'NOVO HÁBITO'"
+  [showBack]="true"
+>
+  <button
+    *ngIf="editId"
+    slot="actions"
+    class="trash-btn"
+    (click)="onDelete()"
+    type="button"
+    aria-label="Excluir hábito"
+  >
+    <app-icon name="trash" [size]="22" color="var(--accent)"></app-icon>
+  </button>
+</app-screen-header>
 
-<ion-content class="ion-padding">
-  @if (form) {
-  <form [formGroup]="form" (ngSubmit)="save()">
+<ion-content>
+  <div class="form-container">
+    @if (form) {
+    <form [formGroup]="form" (ngSubmit)="save()">
 
-    <ion-item [class.field-error]="nameControl.invalid && nameControl.touched">
-      <ion-input
-        label="Nome"
-        labelPlacement="stacked"
-        formControlName="name"
-        placeholder="Ex: Beber água"
-        clearInput
-      ></ion-input>
-    </ion-item>
-    @if (nameControl.touched && nameControl.hasError('required')) {
-      <ion-text color="danger" class="error-msg">
-        <p>Nome é obrigatório</p>
-      </ion-text>
-    }
-    @if (nameControl.touched && nameControl.hasError('maxlength')) {
-      <ion-text color="danger" class="error-msg">
-        <p>Nome deve ter no máximo 50 caracteres</p>
-      </ion-text>
-    }
+      <!-- NOME -->
+      <div class="form-group">
+        <label class="form-label" for="habit-name">Nome do Hábito</label>
+        <div class="input-card" [class.field-error]="nameControl.invalid && nameControl.touched">
+          <input
+            id="habit-name"
+            type="text"
+            formControlName="name"
+            placeholder="Ex: Beber água"
+            class="form-input"
+            autocomplete="off"
+          />
+        </div>
+        <div class="error-msg" *ngIf="nameControl.touched && nameControl.hasError('required')">
+          Nome é obrigatório
+        </div>
+        <div class="error-msg" *ngIf="nameControl.touched && nameControl.hasError('maxlength')">
+          Nome deve ter no máximo 50 caracteres
+        </div>
+      </div>
 
-    <ion-item>
-      <ion-select
-        label="Frequência"
-        labelPlacement="stacked"
-        formControlName="frequencyType"
-        interface="action-sheet"
-        (ionChange)="onFrequencyChange($event)"
-      >
-        @for (opt of frequencyOptions; track opt.value) {
-          <ion-select-option [value]="opt.value">{{ opt.label }}</ion-select-option>
-        }
-      </ion-select>
-    </ion-item>
-    <ion-note class="frequency-hint ion-padding-horizontal">
-      {{ frequencyHint }}
-    </ion-note>
+      <!-- FREQUÊNCIA -->
+      <div class="form-group">
+        <label class="form-label">Frequência</label>
+        <div class="segmented-control">
+          <button
+            *ngFor="let opt of frequencyOptions"
+            type="button"
+            class="seg-option"
+            [class.active]="selectedFrequency === opt.value"
+            (click)="selectFrequency(opt.value)"
+          >
+            {{ opt.label }}
+          </button>
+        </div>
+        <div class="seg-help">{{ frequencyHint }}</div>
 
-    @if (isCustomFrequency) {
-      <div class="day-picker">
-        <p>Dias da semana</p>
-        <div class="day-chips">
-          @for (day of weekDays; track day.value) {
-            <ion-chip
-              [class.day-selected]="isDaySelected(day.value)"
+        <!-- Custom days picker -->
+        <div class="day-picker" *ngIf="isCustomFrequency">
+          <div class="day-chips">
+            <button
+              *ngFor="let day of weekDays"
+              type="button"
+              class="day-chip"
+              [class.selected]="isDaySelected(day.value)"
               (click)="toggleDay(day.value)"
             >
               {{ day.label }}
-            </ion-chip>
-          }
+            </button>
+          </div>
+          <div class="error-msg" *ngIf="form.get('frequencyDays')?.touched && form.get('frequencyDays')?.hasError('noDaySelected')">
+            Selecione pelo menos um dia
+          </div>
         </div>
-        @if (form.get('frequencyDays')?.touched && form.get('frequencyDays')?.hasError('noDaySelected')) {
-          <ion-text color="danger" class="error-msg">
-            <p>Selecione pelo menos um dia</p>
-          </ion-text>
-        }
+
+        <!-- X per week count -->
+        <div class="input-card" *ngIf="isXPerWeek" style="margin-top: 8px">
+          <input
+            type="number"
+            formControlName="xPerWeekCount"
+            class="form-input"
+            min="1"
+            max="7"
+            placeholder="Ex: 3"
+          />
+        </div>
       </div>
-    }
 
-    @if (isXPerWeek) {
-      <ion-item>
-        <ion-input
-          label="Vezes por semana"
-          labelPlacement="stacked"
-          type="number"
-          formControlName="xPerWeekCount"
-          [min]="1"
-          [max]="7"
-        ></ion-input>
-      </ion-item>
-    }
-
-    <ion-item>
-      <ion-input
-        label="Lembrete (opcional)"
-        labelPlacement="stacked"
-        type="time"
-        formControlName="reminderTime"
-      ></ion-input>
-    </ion-item>
-
-    <div class="icon-picker">
-      <p>Ícone</p>
-      <div class="icon-grid">
-        @for (icon of icons; track icon) {
-          <button type="button" class="icon-btn" [class.selected]="form.value.icon === icon"
-            (click)="form.patchValue({ icon })">{{ icon }}</button>
-        }
+      <!-- LEMBRETE -->
+      <div class="form-group">
+        <label class="form-label" for="habit-reminder">Lembrete (opcional)</label>
+        <div class="input-card">
+          <input
+            id="habit-reminder"
+            type="time"
+            formControlName="reminderTime"
+            class="form-input"
+          />
+        </div>
       </div>
-    </div>
 
-    <div class="color-picker">
-      <p>Cor</p>
-      <div class="color-grid">
-        @for (color of colors; track color) {
-          <button type="button" class="color-btn" [class.selected]="form.value.color === color"
-            [style.background]="color" (click)="form.patchValue({ color })">
-            @if (form.value.color === color) {
-              <span class="color-check">✓</span>
-            }
+      <!-- ÍCONE -->
+      <div class="form-group">
+        <label class="form-label">Ícone do Hábito</label>
+        <div class="icon-grid">
+          <button
+            *ngFor="let iconName of icons"
+            type="button"
+            class="icon-cell"
+            [class.selected]="selectedIcon === iconName"
+            (click)="selectIcon(iconName)"
+            [attr.aria-label]="'Ícone ' + iconName"
+            [attr.aria-pressed]="selectedIcon === iconName"
+          >
+            <app-icon [name]="iconName" [size]="26" [stroke]="2"></app-icon>
           </button>
-        }
+        </div>
       </div>
-    </div>
 
-    <ion-button expand="block" type="submit" [attr.disabled]="!isFormValid ? true : null" class="ion-margin-top">
-      Salvar
-    </ion-button>
-  </form>
-  } </ion-content>
+      <!-- BANNER decorativo -->
+      <div class="banner">
+        <div class="banner-hoop">
+          <app-icon name="hoop" [size]="30" color="var(--accent)"></app-icon>
+        </div>
+        <div class="banner-text">Uma só cor de ação. Sem distração.</div>
+      </div>
+
+      <!-- BOTÃO SALVAR -->
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="!isFormValid"
+      >
+        {{ editId ? 'ATUALIZAR' : 'CRIAR HÁBITO' }}
+      </button>
+
+    </form>
+    }
+  </div>
+</ion-content>

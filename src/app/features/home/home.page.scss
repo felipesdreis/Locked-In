@@ -1,70 +1,266 @@
+/* ============================================================
+ * Home Page — "A Quadra"
+ * ============================================================ */
+
+/* HERO CARD: SCOREBOARD */
+.hero-card {
+  margin: 16px 16px 0;
+  padding: 20px;
+  background: var(--asphalt);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+
+  &.scoreboard {
+    .scoreboard-content {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 18px;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .ring-col {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .metrics-col {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+
+      .date-label {
+        font-family: var(--ui);
+        font-size: 10px;
+        letter-spacing: 2px;
+        color: var(--muted);
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .percentage-display {
+        display: flex;
+        align-items: baseline;
+        gap: 2px;
+        margin: 2px 0 0;
+
+        .pct-number {
+          font-family: var(--display);
+          font-size: 52px;
+          font-weight: 700;
+          color: var(--accent);
+          line-height: var(--line-height-tight);
+          filter: drop-shadow(0 0 24px color-mix(in srgb, var(--accent) 40%, transparent));
+        }
+
+        .pct-symbol {
+          font-family: var(--display);
+          font-size: 26px;
+          font-weight: 700;
+          color: var(--accent);
+          line-height: 1;
+          margin-bottom: 2px;
+        }
+      }
+
+      .locked-in-label {
+        font-family: var(--ui);
+        font-size: 10px;
+        letter-spacing: 2px;
+        color: var(--white);
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-top: 2px;
+      }
+
+      .pill-wrapper {
+        margin-top: 10px;
+      }
+    }
+  }
+}
+
+/* HABITS SECTION */
+.habits-section {
+  padding: 18px 16px;
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+
+    .section-title {
+      font-family: var(--display);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--white);
+      margin: 0;
+    }
+
+    .section-counter {
+      font-family: var(--ui);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+  }
+}
+
+/* HABIT ROW */
+.habit-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: var(--row-pad);
+  background: var(--asphalt);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  margin-bottom: var(--row-gap);
+
+  &.completed {
+    background: color-mix(in srgb, var(--accent) 9%, var(--asphalt));
+    border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+
+    .habit-icon {
+      color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 12%, var(--asphalt-2));
+      border-color: color-mix(in srgb, var(--accent) 25%, transparent);
+    }
+  }
+}
+
+.habit-icon-wrapper {
+  flex-shrink: 0;
+}
+
+.habit-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--asphalt-2);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  transition: all 0.2s ease;
+}
+
+.habit-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  text-decoration: none;
+
+  .habit-name {
+    font-family: var(--ui);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--white);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .habit-meta {
+    font-family: var(--ui);
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: nowrap;
+    overflow: hidden;
+
+    .frequency {
+      white-space: nowrap;
+    }
+
+    .meta-sep {
+      color: var(--faint);
+      flex-shrink: 0;
+    }
+
+    .reminder-time {
+      white-space: nowrap;
+    }
+  }
+}
+
+.habit-toggle {
+  flex-shrink: 0;
+}
+
+/* EMPTY STATE */
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 60vh;
+  padding: 48px 24px;
+  gap: 12px;
   text-align: center;
-  padding: 24px;
-  gap: 16px;
-}
 
-.empty-illustration {
-  font-size: 64px;
-  line-height: 1;
-}
-
-.empty-title {
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0 0 8px;
-}
-
-/* 14px medium: with corrected --ion-color-medium (#6e6e6e / light, #909090 / dark),
-   ratio is 5.10:1 (light) and 5.87:1 (dark) — passes AA */
-.empty-subtitle {
-  font-size: 14px;
-  margin: 0;
-}
-
-.tips-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 8px 0;
-}
-
-.tip-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-}
-
-.tip-icon {
-  font-size: 32px;
-  flex-shrink: 0;
-  line-height: 1;
-}
-
-.tip-text {
-  flex: 1;
-
-  strong {
-    display: block;
-    font-size: 16px;
-    margin-bottom: 4px;
-  }
-
-  p {
-    font-size: 14px;
-    color: var(--ion-color-medium);
+  .empty-title {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--white);
     margin: 0;
   }
+
+  .empty-subtitle {
+    font-family: var(--ui);
+    font-size: 14px;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.5;
+  }
 }
 
-// Lift the FAB above the Android gesture navigation bar.
-// env(safe-area-inset-bottom) resolves to the hardware navbar height on gesture-nav
-// devices and to 0 on devices with physical buttons, so this is safe on all form factors.
-ion-fab {
-  bottom: calc(16px + env(safe-area-inset-bottom));
+/* FAB */
+.fab {
+  position: fixed;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  right: 18px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #0F0F0F;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  box-shadow:
+    0 8px 24px -6px color-mix(in srgb, var(--accent) 80%, transparent),
+    0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: scale(1.08);
+    box-shadow:
+      0 12px 28px -6px color-mix(in srgb, var(--accent) 85%, transparent),
+      0 2px 6px rgba(0, 0, 0, 0.4);
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
 }

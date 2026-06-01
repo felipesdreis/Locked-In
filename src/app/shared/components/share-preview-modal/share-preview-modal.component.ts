@@ -1,8 +1,7 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, signal } from '@angular/core';
 import { IonButton, IonSpinner } from '@ionic/angular/standalone';
-import { Habit } from '../../../core/models/habit.model';
-import { ShareService } from '../../../core/services/share.service';
-import { signal } from '@angular/core';
+import { HabitWithStreak } from '../../../core/models/habit.model';
+import { ShareService, ShareDay } from '../../../core/services/share.service';
 
 @Component({
   selector: 'app-share-preview-modal',
@@ -12,8 +11,9 @@ import { signal } from '@angular/core';
   styleUrl: './share-preview-modal.component.scss',
 })
 export class SharePreviewModalComponent implements OnInit, OnDestroy {
-  @Input({ required: true }) habit!: Habit;
-  @Input({ required: true }) streakDays!: number;
+  @Input({ required: true }) habit!: HabitWithStreak;
+  @Input({ required: true }) completionRate!: number;
+  @Input({ required: true }) last7Days!: ShareDay[];
   @Output() closed = new EventEmitter<void>();
 
   readonly imageUrl = signal<string | null>(null);
@@ -27,7 +27,11 @@ export class SharePreviewModalComponent implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     try {
-      this.blob = await this.shareService.generateStreakImage(this.habit, this.streakDays);
+      this.blob = await this.shareService.generateShareImage(
+        this.habit,
+        this.completionRate,
+        this.last7Days,
+      );
       this.objectUrl = URL.createObjectURL(this.blob);
       this.imageUrl.set(this.objectUrl);
     } catch (err) {

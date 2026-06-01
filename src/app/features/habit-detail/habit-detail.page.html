@@ -1,112 +1,145 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home"></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ habit()?.name }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button aria-label="Editar hábito" [routerLink]="['/habit', habitId(), 'edit']">
-        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-      </ion-button>
-      <ion-button aria-label="Arquivar hábito" (click)="confirmArchive()" color="danger">
-        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<app-screen-header [title]="habitTitle()" [showBack]="true">
+  <a
+    slot="actions"
+    class="edit-btn"
+    [routerLink]="['/habit', habitId(), 'edit']"
+    aria-label="Editar hábito"
+  >
+    <app-icon name="edit" [size]="22"></app-icon>
+  </a>
+  <button
+    slot="actions"
+    class="archive-btn"
+    (click)="confirmArchive()"
+    type="button"
+    aria-label="Arquivar hábito"
+  >
+    <app-icon name="archive" [size]="22"></app-icon>
+  </button>
+</app-screen-header>
 
-<ion-content class="ion-padding">
-  @if (habit(); as h) {
-    <ion-card>
-      <ion-card-header>
-        <div class="habit-hero" [style.background]="h.color">
-          <span class="habit-icon">{{ h.icon }}</span>
+<ion-content>
+  <div class="detail-container" *ngIf="habit() as h">
+
+    <!-- HERO CARD -->
+    <section class="hero-card">
+      <app-court-mark opacity="calc(var(--court-strength) * 2.0)"></app-court-mark>
+
+      <div class="hero-top">
+        <!-- Icon -->
+        <div class="habit-icon-large">
+          <app-icon [name]="h.icon" [size]="48" [stroke]="2"></app-icon>
         </div>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-grid>
-          <ion-row>
-            <ion-col class="stat">
-              <div class="stat-value">{{ h.currentStreak }}</div>
-              <div class="stat-label">Streak atual</div>
-            </ion-col>
-            <ion-col class="stat">
-              <div class="stat-value">{{ h.longestStreak }}</div>
-              <div class="stat-label">Maior streak</div>
-            </ion-col>
-            <ion-col class="stat">
-              <div class="stat-value">{{ h.totalCompletions }}</div>
-              <div class="stat-label">Total</div>
-            </ion-col>
-            <ion-col class="stat">
-              <div class="stat-value">{{ completionRate() }}%</div>
-              <div class="stat-label">Taxa (30d)</div>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-      </ion-card-content>
-    </ion-card>
 
-    <!-- Share streak button (only when streak >= 7) -->
-    @if (canShare()) {
-      <ion-button expand="block" fill="outline" class="share-btn" (click)="openShareModal()">
-        <ion-icon slot="start" name="share-outline"></ion-icon>
-        Compartilhar 🎯 {{ h.currentStreak }} dias
-      </ion-button>
-    }
-
-    <!-- Calendar with period navigation -->
-    <div class="period-nav">
-      <ion-button fill="clear" size="small" aria-label="Período anterior" (click)="shiftPeriod(1)">
-        <ion-icon slot="icon-only" name="chevron-back-outline"></ion-icon>
-      </ion-button>
-      <span class="period-label">{{ periodLabel() }}</span>
-      <ion-button fill="clear" size="small" aria-label="Próximo período" (click)="shiftPeriod(-1)" [attr.disabled]="!canGoForward() ? true : null">
-        <ion-icon slot="icon-only" name="chevron-forward-outline"></ion-icon>
-      </ion-button>
-    </div>
-
-    <div class="calendar-grid">
-      @for (day of periodDays(); track day.toISOString()) {
-        <div class="day-cell" [class.completed]="isCompleted(day)" [style.--color]="h.color">
-          <span class="day-label">{{ day.getDate() }}</span>
-        </div>
-      }
-    </div>
-
-    <!-- Conquistas -->
-    @if (h.badge7Days || h.badge30Days || h.badge100Days) {
-      <div class="achievements-section">
-        <h3 class="achievements-title">Conquistas</h3>
-        <div class="achievements-list">
-          @if (h.badge7Days) {
-            <div class="achievement-badge">
-              <span class="achievement-emoji">🌟</span>
-              <span class="achievement-label">7 dias</span>
-            </div>
-          }
-          @if (h.badge30Days) {
-            <div class="achievement-badge">
-              <span class="achievement-emoji">🏆</span>
-              <span class="achievement-label">30 dias</span>
-            </div>
-          }
-          @if (h.badge100Days) {
-            <div class="achievement-badge">
-              <span class="achievement-emoji">💎</span>
-              <span class="achievement-label">100 dias</span>
-            </div>
-          }
+        <!-- ON FIRE badge -->
+        <div class="on-fire-badge" *ngIf="h.currentStreak >= 5">
+          <span class="badge-label">ON FIRE</span>
+          <app-streak [days]="h.currentStreak" [size]="16"></app-streak>
         </div>
       </div>
-    }
-  }
+
+      <!-- BOX SCORE STRIP -->
+      <div class="box-score-strip">
+        <div class="stat-box accent">
+          <div class="stat-number">{{ h.currentStreak }}</div>
+          <div class="stat-label">STREAK<br>ATUAL</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-box">
+          <div class="stat-number">{{ h.longestStreak }}</div>
+          <div class="stat-label">MAIOR<br>STREAK</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-box accent">
+          <div class="stat-number">{{ h.totalCompletions }}</div>
+          <div class="stat-label">TOTAL<br>FEITO</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-box">
+          <div class="stat-number">{{ completionRate() }}%</div>
+          <div class="stat-label">TAXA<br>30D</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Share button -->
+    <div class="share-row" *ngIf="canShare()">
+      <button class="share-btn" (click)="openShareModal()" type="button">
+        <app-icon name="hoop" [size]="18"></app-icon>
+        <span>Compartilhar progresso</span>
+      </button>
+    </div>
+
+    <!-- MONTHLY CALENDAR -->
+    <section class="calendar-section">
+      <div class="calendar-header">
+        <button class="nav-btn" (click)="previousMonth()" type="button" aria-label="Mês anterior">
+          <app-icon name="chevL" [size]="22" color="var(--accent)"></app-icon>
+        </button>
+        <h2 class="month-label">{{ monthLabel() }}</h2>
+        <button class="nav-btn" (click)="nextMonth()" type="button" aria-label="Próximo mês">
+          <app-icon name="chevR" [size]="22" color="var(--accent)"></app-icon>
+        </button>
+      </div>
+
+      <!-- Weekday headers -->
+      <div class="calendar-weekdays">
+        <div class="weekday" *ngFor="let d of weekDayLabels">{{ d }}</div>
+      </div>
+
+      <!-- Day grid -->
+      <div class="calendar-grid">
+        <button
+          *ngFor="let dayObj of calendarDays()"
+          class="calendar-cell"
+          [class.other-month]="!dayObj.isCurrentMonth"
+          [class.today]="isToday(dayObj.date)"
+          [class.completed]="isCompleted(dayObj.date) && dayObj.isCurrentMonth"
+          [class.future]="isFuture(dayObj.date)"
+          [disabled]="!isToday(dayObj.date)"
+          (click)="toggleToday()"
+          type="button"
+        >
+          {{ dayObj.date.getDate() }}
+        </button>
+      </div>
+    </section>
+
+    <!-- Achievement badges -->
+    <section class="achievements-section" *ngIf="h.badge7Days || h.badge30Days || h.badge100Days">
+      <h3 class="achievements-title">CONQUISTAS</h3>
+      <div class="achievements-list">
+        <div class="achievement-badge" *ngIf="h.badge7Days">
+          <div class="badge-circle">
+            <app-icon name="fire" [size]="20" color="var(--accent)"></app-icon>
+          </div>
+          <span class="badge-label">7 dias</span>
+        </div>
+        <div class="achievement-badge" *ngIf="h.badge30Days">
+          <div class="badge-circle">
+            <app-icon name="target" [size]="20" color="var(--accent)"></app-icon>
+          </div>
+          <span class="badge-label">30 dias</span>
+        </div>
+        <div class="achievement-badge" *ngIf="h.badge100Days">
+          <div class="badge-circle">
+            <app-icon name="hoop" [size]="20" color="var(--accent)"></app-icon>
+          </div>
+          <span class="badge-label">100 dias</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom padding -->
+    <div style="height: 32px"></div>
+  </div>
 </ion-content>
 
 @if (showShareModal() && habit()) {
   <app-share-preview-modal
     [habit]="habit()!"
-    [streakDays]="habit()!.currentStreak"
+    [completionRate]="completionRate()"
+    [last7Days]="last7Days()"
     (closed)="onShareClosed()"
   />
 }

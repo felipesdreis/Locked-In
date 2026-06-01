@@ -145,8 +145,9 @@ export class StreakService {
       case 'daily': return true;
       case 'weekdays': return dow >= 1 && dow <= 5;
       case 'weekends': return dow === 0 || dow === 6;
-      case 'custom': return habit.frequencyDays.includes(dow);
-      default: return false;
+      case 'custom':     return habit.frequencyDays.includes(dow);
+      case 'x_per_week': return true;
+      default:           return false;
     }
   }
 }

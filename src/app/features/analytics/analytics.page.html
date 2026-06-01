@@ -1,172 +1,129 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Analytics</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-screen-header title="BOX SCORE" [showBack]="true"></app-screen-header>
 
-<ion-content class="ion-padding">
+<ion-content>
+  <div class="analytics-container">
 
-  <!-- Locked In % — métrica principal da marca -->
-  <ion-card class="stat-card locked-in-card">
-    <ion-card-content>
-      <div class="locked-in-percent">{{ weeklyRate() }}%</div>
-      <div class="locked-in-label">LOCKED IN %</div>
-      <div class="stat-sub">Taxa dos últimos 7 dias</div>
-    </ion-card-content>
-  </ion-card>
+    <!-- HERO: LOCKED IN % -->
+    <section class="hero-card locked-in-hero">
+      <app-court-mark opacity="calc(var(--court-strength) * 2.6)"></app-court-mark>
 
-  <!-- Summary cards -->
-  <ion-grid class="summary-grid">
-    <ion-row>
-      <ion-col size="6">
-        <ion-card class="stat-card">
-          <ion-card-content>
-            <div class="stat-number">{{ todayRate() }}%</div>
-            <div class="stat-desc">Hoje</div>
-            <div class="stat-sub">{{ completedTodayCount() }}/{{ totalHabits() }} hábitos</div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-      <ion-col size="6">
-        <ion-card class="stat-card">
-          <ion-card-content>
-            <div class="stat-number">{{ totalHabits() }}</div>
-            <div class="stat-desc">Hábitos</div>
-            <div class="stat-sub">{{ totalCompletions() }} completions</div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+      <div class="hero-content">
+        <div class="hero-label">LOCKED IN %</div>
+        <div class="percentage-display">
+          <span class="pct-number">{{ weeklyRate() }}</span>
+          <span class="pct-symbol">%</span>
+        </div>
+        <div class="hero-subtext">últimos 7 dias (semana ISO)</div>
 
-  <!-- ISSUE 010 — At-risk habits: only shown when there are habits with streak < 3 -->
-  @if (habitsAtRisk().length > 0) {
-    <ion-card class="at-risk-card">
-      <ion-card-content>
-        <div class="section-label">Em risco</div>
-        <ion-list lines="none">
-          @for (habit of habitsAtRisk(); track habit.id) {
-            <ion-item class="at-risk-item">
-              <span slot="start" class="at-risk-icon">{{ habit.icon }}</span>
-              <ion-label>
-                <h3>{{ habit.name }}</h3>
-              </ion-label>
-              <div slot="end" class="at-risk-streak">
-                @if (habit.currentStreak === 0) {
-                  <span class="at-risk-never">Nunca completado</span>
-                } @else {
-                  <span>{{ habit.currentStreak }} 🔥</span>
-                }
-              </div>
-            </ion-item>
-          }
-        </ion-list>
-      </ion-card-content>
-    </ion-card>
-  }
+        <!-- Mini stats strip -->
+        <div class="mini-stats">
+          <div class="mini-stat">
+            <span class="mini-value">{{ todayRate() }}%</span>
+            <span class="mini-label">HOJE</span>
+          </div>
+          <span class="mini-divider">|</span>
+          <div class="mini-stat">
+            <span class="mini-value">{{ completedTodayCount() }}/{{ totalHabits() }}</span>
+            <span class="mini-label">HÁBITOS</span>
+          </div>
+          <span class="mini-divider">|</span>
+          <div class="mini-stat">
+            <span class="mini-value">{{ totalCompletions() }}</span>
+            <span class="mini-label">TOTAL</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  <!-- Top Streaks -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Maiores streaks ativos</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list lines="none">
-        @for (habit of topStreaks(); track habit.id) {
-          <ion-item>
-            <span slot="start" style="font-size: 24px">{{ habit.icon }}</span>
-            <ion-label>
-              <h3>{{ habit.name }}</h3>
-              <p>Maior: {{ habit.longestStreak }} dias</p>
-            </ion-label>
-            <div slot="end" class="streak-badge">{{ habit.currentStreak }} 🔥</div>
-          </ion-item>
-        } @empty {
-          <p class="empty-msg">Nenhum hábito ainda.</p>
-        }
-      </ion-list>
-    </ion-card-content>
-  </ion-card>
+    <!-- STATS TABLE: per-habit -->
+    <section class="stats-table-section" *ngIf="habitsTable().length > 0">
+      <div class="table-header">
+        <div class="col-habit">HÁBITO</div>
+        <div class="col-check">HOJE</div>
+        <div class="col-stk">STK</div>
+        <div class="col-rate">TAXA</div>
+      </div>
 
-  <!-- Weekly bar chart -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Completions por dia da semana</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      @if (totalCompletions() === 0) {
+      <div class="table-rows">
+        <div *ngFor="let habit of habitsTable()" class="table-row">
+          <div class="col-habit">
+            <app-icon [name]="habit.icon" [size]="18"></app-icon>
+            <span class="habit-name">{{ habit.name }}</span>
+          </div>
+          <div class="col-check">
+            <app-icon
+              *ngIf="habit.completedToday"
+              name="check"
+              [size]="16"
+              color="var(--accent)"
+            ></app-icon>
+          </div>
+          <div class="col-stk" [class.hot]="habit.currentStreak >= 5">
+            {{ habit.currentStreak }}
+          </div>
+          <div class="col-rate">{{ habit.overallRate }}%</div>
+        </div>
+      </div>
+    </section>
+
+    <app-court-line></app-court-line>
+
+    <!-- BAR CHART: completions per day of week -->
+    <section class="bar-chart-section">
+      <h3>CONVERSÕES POR DIA</h3>
+      <div class="bar-chart" *ngIf="totalCompletions() > 0; else emptyChart">
+        <div *ngFor="let bar of weekdayBars()" class="bar-container">
+          <div class="bar-track">
+            <div
+              class="bar-fill"
+              [style.height.px]="getBarHeight(bar.rate)"
+              [class.hot]="bar.rate >= 50"
+            ></div>
+          </div>
+          <div class="bar-label">{{ bar.label }}</div>
+        </div>
+      </div>
+      <ng-template #emptyChart>
         <p class="empty-msg">Complete hábitos para ver o gráfico.</p>
-      } @else {
-        <div class="bar-chart">
-          @for (bar of weekdayBars(); track bar.label) {
-            <div class="bar-col">
-              <span class="bar-count">{{ bar.count }}</span>
-              <div class="bar-fill" [style.height.px]="bar.heightPx"></div>
-              <span class="bar-label">{{ bar.label }}</span>
-            </div>
-          }
+      </ng-template>
+    </section>
+
+    <!-- LEADERBOARD: top streaks -->
+    <section class="leaderboard-section">
+      <h3>MAIORES STREAKS</h3>
+      <div class="leaderboard">
+        <div
+          *ngFor="let habit of topStreaks(); let i = index"
+          class="leaderboard-row"
+          [class.top1]="i === 0"
+        >
+          <div class="rank">{{ i + 1 }}</div>
+          <div class="habit-name-cell">
+            <app-icon [name]="habit.icon" [size]="18" color="var(--muted)"></app-icon>
+            <span class="name">{{ habit.name }}</span>
+          </div>
+          <app-streak [days]="habit.currentStreak" [size]="16"></app-streak>
         </div>
-      }
-    </ion-card-content>
-  </ion-card>
-
-  <!-- 30-day heatmap -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Últimos 30 dias</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      @if (totalCompletions() === 0) {
-        <p class="empty-msg">Nenhuma completion registrada.</p>
-      } @else {
-        <div class="heatmap">
-          @for (day of heatmapDays(); track day.date) {
-            <div class="heat-cell" [ngClass]="day.intensity" [title]="day.date + ': ' + day.count">
-              <span class="heat-label">{{ day.day }}</span>
-            </div>
-          }
+        <div *ngIf="topStreaks().length === 0" class="empty-msg">
+          Nenhum hábito ainda.
         </div>
-      }
-    </ion-card-content>
-  </ion-card>
+      </div>
+    </section>
 
-  <!-- Per-habit table — ISSUE 005: frequency-aware weekly rate -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Por hábito</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      @if (habitsTable().length === 0) {
-        <p class="empty-msg">Nenhum hábito ainda.</p>
-      } @else {
-        <table class="habit-table">
-          <thead>
-            <tr>
-              <th>Hábito</th>
-              <th>Streak</th>
-              <th>Maior</th>
-              <th>Taxa</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (h of habitsTable(); track h.id) {
-              <tr>
-                <td class="habit-name-col">
-                  <span class="habit-icon-sm">{{ h.icon }}</span>
-                  <span class="habit-name-text">{{ h.name }}</span>
-                </td>
-                <td>{{ h.currentStreak }}🔥</td>
-                <td>{{ h.longestStreak }}</td>
-                <td class="overall-rate-col">{{ h.overallRate }}%</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      }
-    </ion-card-content>
-  </ion-card>
+    <!-- AT RISK: habits with streak < 3 -->
+    <section class="at-risk-section" *ngIf="habitsAtRisk().length > 0">
+      <h3>EM RISCO</h3>
+      <div class="at-risk-list">
+        <div *ngFor="let habit of habitsAtRisk()" class="at-risk-row">
+          <app-icon [name]="habit.icon" [size]="20" color="var(--muted)"></app-icon>
+          <span class="at-risk-name">{{ habit.name }}</span>
+          <span class="at-risk-streak" *ngIf="habit.currentStreak === 0">Nunca</span>
+          <app-streak *ngIf="habit.currentStreak > 0" [days]="habit.currentStreak" [size]="14"></app-streak>
+        </div>
+      </div>
+    </section>
 
+    <!-- Bottom padding -->
+    <div style="height: 32px"></div>
+  </div>
 </ion-content>

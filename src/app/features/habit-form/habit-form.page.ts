@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import {
-  IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel,
-  IonInput, IonButton, IonButtons, IonBackButton, IonSelect, IonSelectOption,
-  IonChip, IonText, IonNote,
-} from '@ionic/angular/standalone';
+import { NgFor, NgIf } from '@angular/common';
+import { IonContent } from '@ionic/angular/standalone';
 import { HabitService } from '../../core/services/habit.service';
 import { FrequencyType } from '../../core/models/habit.model';
+import { ScreenHeaderComponent } from '../../shared/components/screen-header/screen-header.component';
+import { IconComponent } from '../../shared/components/icon/icon.component';
 
 const FREQUENCY_HINTS: Record<string, string> = {
   daily: 'Executado todos os dias sem exceção.',
@@ -37,9 +36,11 @@ function atLeastOneDaySelected(control: AbstractControl): ValidationErrors | nul
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel,
-    IonInput, IonButton, IonButtons, IonBackButton, IonSelect, IonSelectOption,
-    IonChip, IonText, IonNote,
+    NgFor,
+    NgIf,
+    IonContent,
+    ScreenHeaderComponent,
+    IconComponent,
   ],
   templateUrl: './habit-form.page.html',
   styleUrl: './habit-form.page.scss',
@@ -49,12 +50,18 @@ export class HabitFormPage implements OnInit {
   editId: string | null = null;
 
   readonly weekDays = WEEK_DAYS;
-  readonly icons = ['💪', '📚', '🏃', '🧘', '💧', '🥗', '😴', '✍️', '🎯', '🎵'];
-  readonly colors = ['#6c63ff', '#ff6584', '#43b89c', '#f9a825', '#e57373', '#42a5f5'];
+
+  // SVG icon names available in the design system
+  readonly icons = [
+    'dumbbell', 'book', 'water', 'meditate', 'pill',
+    'sleep', 'run', 'music', 'target', 'write',
+    'fire', 'clock', 'chart', 'hoop', 'gear',
+  ];
+
   readonly frequencyOptions: { label: string; value: FrequencyType }[] = [
     { label: 'Todo dia', value: 'daily' },
-    { label: 'Dias de semana', value: 'weekdays' },
-    { label: 'Fins de semana', value: 'weekends' },
+    { label: 'Seg a Sex', value: 'weekdays' },
+    { label: 'Fim de semana', value: 'weekends' },
     { label: 'Dias específicos', value: 'custom' },
     { label: 'X vezes por semana', value: 'x_per_week' },
   ];
@@ -68,7 +75,6 @@ export class HabitFormPage implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.editId = this.route.snapshot.paramMap.get('id');
-    // Garante que os signals estão atualizados — necessário na edição via navegação direta
     await this.habitService.load();
     this.buildForm();
   }
@@ -85,8 +91,8 @@ export class HabitFormPage implements OnInit {
 
     this.form = this.fb.group({
       name: [existing?.name ?? '', [Validators.required, Validators.maxLength(50)]],
-      icon: [existing?.icon ?? '💪'],
-      color: [existing?.color ?? '#6c63ff'],
+      icon: [existing?.icon ?? 'dumbbell'],
+      color: [existing?.color ?? '#D84315'],
       frequencyType: [initialType],
       frequencyDays: [existing?.frequencyDays ?? [], initialType === 'custom' ? atLeastOneDaySelected : []],
       xPerWeekCount: [initialXPerWeekCount, [Validators.min(1), Validators.max(7)]],
@@ -121,6 +127,14 @@ export class HabitFormPage implements OnInit {
     return this.form.get('name')!;
   }
 
+  get selectedFrequency(): string {
+    return this.form.get('frequencyType')?.value ?? 'daily';
+  }
+
+  get selectedIcon(): string {
+    return this.form.get('icon')?.value ?? 'dumbbell';
+  }
+
   isDaySelected(day: number): boolean {
     const days: number[] = this.form.get('frequencyDays')?.value ?? [];
     return days.includes(day);
@@ -135,8 +149,12 @@ export class HabitFormPage implements OnInit {
     this.form.get('frequencyDays')?.markAsTouched();
   }
 
-  onFrequencyChange(event: CustomEvent): void {
-    this.form.patchValue({ frequencyType: event.detail.value });
+  selectIcon(iconName: string): void {
+    this.form.patchValue({ icon: iconName });
+  }
+
+  selectFrequency(value: string): void {
+    this.form.patchValue({ frequencyType: value });
   }
 
   get isFormValid(): boolean {
@@ -157,12 +175,12 @@ export class HabitFormPage implements OnInit {
         ? [value.xPerWeekCount as number]
         : [];
     const payload = {
-      name: value.name,
-      icon: value.icon,
-      color: value.color,
+      name: value.name as string,
+      icon: value.icon as string,
+      color: value.color as string,
       frequencyType: value.frequencyType as FrequencyType,
       frequencyDays,
-      reminderTime: value.reminderTime || null,
+      reminderTime: (value.reminderTime as string) || null,
     };
 
     if (this.editId) {
@@ -171,5 +189,12 @@ export class HabitFormPage implements OnInit {
       await this.habitService.create(payload);
     }
     await this.router.navigateByUrl('/home');
+  }
+
+  async onDelete(): Promise<void> {
+    if (this.editId && confirm(`Excluir "${this.form.get('name')?.value}"? Todo o histórico será perdido. Sem volta.`)) {
+      await this.habitService.delete(this.editId);
+      await this.router.navigateByUrl('/home');
+    }
   }
 }

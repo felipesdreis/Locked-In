@@ -1,48 +1,101 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Locked In</ion-title>
-    <ion-buttons slot="end">
-      <ion-button aria-label="Como funciona?" (click)="openHowItWorks()">
-        <ion-icon slot="icon-only" name="help-circle-outline"></ion-icon>
-      </ion-button>
-      <ion-button aria-label="Ver hábitos arquivados" routerLink="/archived">
-        <ion-icon slot="icon-only" name="archive-outline"></ion-icon>
-      </ion-button>
-      <ion-button aria-label="Ver analytics" routerLink="/analytics">
-        <ion-icon slot="icon-only" name="stats-chart"></ion-icon>
-      </ion-button>
-      <ion-button aria-label="Configurações" routerLink="/settings">
-        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<app-topbar></app-topbar>
 
-<ion-content>
-  <ion-list>
-    @for (habit of habits(); track habit.id) {
-      <app-habit-card [habit]="habit" (toggle)="toggleHabit(habit.id)" />
-    } @empty {
-      <div class="empty-state">
-        <span class="empty-illustration">🔒</span>
-        <ion-text color="medium">
-          <h2 class="empty-title">Nenhum hábito ainda</h2>
-          <p class="empty-subtitle">Toque no + para criar o seu primeiro hábito e começar a construir streaks.</p>
-        </ion-text>
-        <ion-button fill="outline" size="small" (click)="openHowItWorks()">
-          <ion-icon slot="start" name="help-circle-outline"></ion-icon>
-          Como funciona?
-        </ion-button>
+<ion-content [scrollY]="true">
+  <!-- HERO CARD: SCOREBOARD -->
+  <section class="hero-card scoreboard">
+    <app-court-mark opacity="calc(var(--court-strength) * 2.4)"></app-court-mark>
+
+    <div class="scoreboard-content">
+      <!-- Left: Ring de progresso -->
+      <div class="ring-col">
+        <app-ring
+          [done]="completedToday()"
+          [total]="totalHabits()"
+          [size]="92"
+          [strokeWidth]="7"
+        ></app-ring>
       </div>
-    }
-  </ion-list>
 
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button routerLink="/habit/new">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+      <!-- Right: Métricas -->
+      <div class="metrics-col">
+        <div class="date-label">{{ todayFormatted() }}</div>
+        <div class="percentage-display">
+          <span class="pct-number">{{ percentageToday() }}</span><span class="pct-symbol">%</span>
+        </div>
+        <div class="locked-in-label">LOCKED IN HOJE</div>
+
+        <div class="pill-wrapper" *ngIf="bestStreak() > 0">
+          <app-pill label="MELHOR STREAK">
+            <app-streak [days]="bestStreak()" [size]="15"></app-streak>
+          </app-pill>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEÇÃO: LISTA DE HÁBITOS -->
+  <section class="habits-section">
+    <div class="section-header">
+      <h2 class="section-title">A QUADRA</h2>
+      <div class="section-counter">{{ completedToday() }}/{{ totalHabits() }} CONVERTIDOS</div>
+    </div>
+
+    <!-- List with habits -->
+    <div class="habits-list" *ngIf="totalHabits() > 0">
+      <div
+        *ngFor="let habit of habits()"
+        class="habit-row"
+        [class.completed]="habit.completedToday"
+      >
+        <!-- Icon -->
+        <div class="habit-icon-wrapper">
+          <div class="habit-icon">
+            <app-icon
+              [name]="habit.icon"
+              [size]="26"
+              [stroke]="2"
+            ></app-icon>
+          </div>
+        </div>
+
+        <!-- Info -->
+        <a class="habit-info" [routerLink]="['/habit', habit.id]" [attr.aria-label]="'Ver detalhe de ' + habit.name">
+          <div class="habit-name">{{ habit.name }}</div>
+          <div class="habit-meta">
+            <span class="frequency">{{ getFrequencyLabel(habit) }}</span>
+            <span class="meta-sep" *ngIf="habit.reminderTime"> &middot; </span>
+            <span class="reminder-time" *ngIf="habit.reminderTime">{{ habit.reminderTime }}</span>
+            <span class="meta-sep"> &middot; </span>
+            <app-streak [days]="habit.currentStreak" [size]="14"></app-streak>
+          </div>
+        </a>
+
+        <!-- Toggle -->
+        <div class="habit-toggle">
+          <app-hoop
+            [checked]="habit.completedToday"
+            (change)="toggleHabit(habit.id)"
+          ></app-hoop>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="totalHabits() === 0">
+      <app-icon name="hoop" [size]="52" color="var(--faint)"></app-icon>
+      <p class="empty-title">QUADRA VAZIA</p>
+      <p class="empty-subtitle">Toque no + para criar o seu primeiro hábito.</p>
+    </div>
+  </section>
+
+  <!-- Padding for FAB -->
+  <div style="height: 80px"></div>
 </ion-content>
+
+<!-- FAB -->
+<button class="fab" routerLink="/habit/new" aria-label="Criar novo hábito" type="button">
+  <app-icon name="plus" [size]="28" [stroke]="2.6" color="#0F0F0F"></app-icon>
+</button>
 
 @if (showOnboarding()) {
   <app-onboarding-tutorial (dismissed)="onOnboardingDismissed()" />

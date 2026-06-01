@@ -4,6 +4,7 @@ import { Habit, Completion, HabitWithStreak } from '../models/habit.model';
 import { StreakService } from './streak.service';
 import { NotificationService } from './notification.service';
 import { toDateString, currentIsoWeekDates } from '../utils/date.util';
+import { WidgetService } from './widget.service';
 
 export type BadgeMilestone = 7 | 30 | 100;
 
@@ -52,6 +53,7 @@ export class HabitService {
     private db: DbService,
     private streak: StreakService,
     private notifications: NotificationService,
+    private widget: WidgetService,
   ) {}
 
   async load(): Promise<void> {
@@ -71,7 +73,7 @@ export class HabitService {
       [id, habit.name, habit.icon, habit.color, habit.frequencyType, JSON.stringify(habit.frequencyDays), habit.reminderTime, createdAt],
     );
     if (habit.reminderTime) {
-      await this.notifications.schedule({ id, name: habit.name, reminderTime: habit.reminderTime });
+      await this.notifications.schedule({ id, name: habit.name, reminderTime: habit.reminderTime, frequencyType: habit.frequencyType, frequencyDays: habit.frequencyDays });
     }
     await this.load();
   }
@@ -86,7 +88,7 @@ export class HabitService {
     );
     await this.notifications.cancel(id);
     if (updated.reminderTime) {
-      await this.notifications.schedule({ id, name: updated.name, reminderTime: updated.reminderTime });
+      await this.notifications.schedule({ id, name: updated.name, reminderTime: updated.reminderTime, frequencyType: updated.frequencyType, frequencyDays: updated.frequencyDays });
     }
     await this.load();
   }
@@ -121,11 +123,13 @@ export class HabitService {
     const existing = this._completions().find(c => c.habitId === habitId && c.completedAt === today);
     if (existing) {
       await this.db.run(`DELETE FROM completions WHERE id=?`, [existing.id]);
+      this.widget.requestUpdate();
       await this.load();
       return null;
     }
 
     await this.db.run(`INSERT INTO completions (id, habit_id, completed_at) VALUES (?, ?, ?)`, [crypto.randomUUID(), habitId, today]);
+    this.widget.requestUpdate();
     await this.load();
 
     // Check for milestone badges after loading updated data

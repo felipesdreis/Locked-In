@@ -2,38 +2,33 @@ import { Component, signal } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
-import {
-  IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton,
-  IonList, IonItem, IonLabel, IonButton, IonIcon, IonNote,
-} from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import {
-  downloadOutline, mailOutline, logoGithub, shieldCheckmarkOutline,
-  informationCircleOutline, cloudDownloadOutline,
-} from 'ionicons/icons';
+import { NgIf } from '@angular/common';
+import { IonContent } from '@ionic/angular/standalone';
 import { DbService } from '../../core/services/db.service';
+import { ScreenHeaderComponent } from '../../shared/components/screen-header/screen-header.component';
+import { CourtMarkComponent } from '../../shared/components/court-mark/court-mark.component';
+import { WordmarkComponent } from '../../shared/components/wordmark/wordmark.component';
+import { IconComponent } from '../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
   imports: [
-    IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton,
-    IonList, IonItem, IonLabel, IonButton, IonIcon, IonNote,
+    NgIf,
+    IonContent,
+    ScreenHeaderComponent,
+    CourtMarkComponent,
+    WordmarkComponent,
+    IconComponent,
   ],
   templateUrl: './settings.page.html',
   styleUrl: './settings.page.scss',
 })
 export class SettingsPage {
   readonly exporting = signal(false);
+  readonly appVersion = '2.0.0';
 
-  readonly appVersion = '1.1.0';
-
-  constructor(private db: DbService) {
-    addIcons({
-      downloadOutline, mailOutline, logoGithub, shieldCheckmarkOutline,
-      informationCircleOutline, cloudDownloadOutline,
-    });
-  }
+  constructor(private db: DbService) {}
 
   async exportData(): Promise<void> {
     if (this.exporting()) return;

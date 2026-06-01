@@ -1,8 +1,142 @@
-.section-header {
-  font-size: 12px;
-  font-weight: 700;
+/* ============================================================
+ * Settings Page — v3.0 Basketball Design
+ * ============================================================ */
+
+.settings-container {
+  background: var(--bg);
+  padding: 20px 16px;
+  min-height: 100%;
+}
+
+.settings-group {
+  margin-bottom: 22px;
+}
+
+.group-label {
+  font-family: var(--ui);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--ion-color-medium);
-  padding: 20px 20px 4px;
+  font-weight: 600;
+  margin: 0 0 10px 4px;
+}
+
+/* SETTINGS CARD (groups rows) */
+.settings-card {
+  background: var(--asphalt);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.row-divider {
+  height: 1px;
+  background: var(--line);
+  margin: 0 16px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  background: transparent;
+  border: none;
+  color: var(--white);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: var(--asphalt-2);
+  }
+
+  &:active {
+    background: color-mix(in srgb, var(--accent) 8%, var(--asphalt));
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.row-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--asphalt-2);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.row-content {
+  flex: 1;
+  min-width: 0;
+
+  .row-title {
+    font-family: var(--ui);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--white);
+  }
+
+  .row-subtitle {
+    font-family: var(--ui);
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+}
+
+/* ABOUT CARD */
+.about-card {
+  background: var(--asphalt);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 28px 24px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+  text-align: center;
+
+  .app-version {
+    font-family: var(--display);
+    font-size: 14px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .app-tagline {
+    font-family: var(--ui);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--white);
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+
+  .app-desc {
+    font-family: var(--ui);
+    font-size: 12px;
+    color: var(--faint);
+    margin: 0;
+  }
 }
