@@ -165,6 +165,10 @@ export class HabitService {
     await this.load();
   }
 
+  isScheduledForDay(habit: Habit, date: Date): boolean {
+    return this.streak.isScheduledDay(habit, date);
+  }
+
   getCompletionsFor(habitId: string): Completion[] {
     return this._completions().filter(c => c.habitId === habitId);
   }

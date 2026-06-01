@@ -47,11 +47,18 @@ export class HomePage implements OnInit, OnDestroy {
     })
   );
 
+  // Only habits scheduled for today count toward the daily completion rate.
+  // Habits set to "specific days" (custom) that don't include today are excluded.
+  private readonly habitsScheduledToday = computed(() => {
+    const today = new Date();
+    return this.habits().filter(h => this.habitService.isScheduledForDay(h, today));
+  });
+
   readonly completedToday = computed(() =>
-    this.habits().filter(h => h.completedToday).length
+    this.habitsScheduledToday().filter(h => h.completedToday).length
   );
 
-  readonly totalHabits = computed(() => this.habits().length);
+  readonly totalHabits = computed(() => this.habitsScheduledToday().length);
 
   readonly percentageToday = computed(() => {
     const total = this.totalHabits();

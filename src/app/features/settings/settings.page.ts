@@ -26,7 +26,7 @@ import { IconComponent } from '../../shared/components/icon/icon.component';
 })
 export class SettingsPage {
   readonly exporting = signal(false);
-  readonly appVersion = '2.0.0';
+  readonly appVersion = '3.0.0';
 
   constructor(private db: DbService) {}
 

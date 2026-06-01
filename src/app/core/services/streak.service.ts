@@ -139,7 +139,7 @@ export class StreakService {
     return byWeek;
   }
 
-  private isScheduledDay(habit: Habit, date: Date): boolean {
+  isScheduledDay(habit: Habit, date: Date): boolean {
     const dow = date.getDay(); // 0=Sun
     switch (habit.frequencyType) {
       case 'daily': return true;
