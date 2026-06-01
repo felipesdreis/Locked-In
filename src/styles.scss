@@ -32,6 +32,16 @@
   --ion-color-danger-contrast-rgb: 255, 255, 255;
   --ion-color-danger-shade: #a93226;
   --ion-color-danger-tint: #c94d42;
+
+  /* warning aligned to brand — amber-orange, not Ionic default yellow */
+  --ion-color-warning: #E65100;
+  --ion-color-warning-rgb: 230, 81, 0;
+  --ion-color-warning-shade: #cc4700;
+  --ion-color-warning-tint: #ff6d00;
+
+  /* brand shorthand tokens */
+  --border-accent: 4px solid var(--ion-color-primary);
+  --color-heat-empty: #2a2a2a;
 }
 
 ion-title {
@@ -39,9 +49,24 @@ ion-title {
   letter-spacing: 1px;
 }
 
+body.dark ion-title {
+  letter-spacing: 2px;
+  color: var(--ion-text-color);
+}
+
 ion-card-title {
   font-family: var(--font-brand);
   letter-spacing: 0.5px;
+}
+
+/* QW-1: brand font for all numeric/streak labels */
+ion-note, .streak-count, .stat-number {
+  font-family: var(--font-brand);
+}
+
+/* QW-6: smooth background transition on tap */
+ion-item {
+  --transition: background 250ms ease-out;
 }
 
 body.dark {
@@ -69,6 +94,9 @@ body.dark {
   --ion-toolbar-background: #1a1a1a;
   --ion-tab-bar-background: #1a1a1a;
   --ion-border-color: #333333;
+  --ion-color-warning: #FF6D00;
+  --ion-color-warning-tint: #ff8f00;
+  --color-heat-empty: #1a1a1a;
   /* Overlay background: used by action-sheet, alert, popover panels.
      Without this, the MD action-sheet falls back to --ion-background-color (#121212),
      producing dark text (#262626 via --ion-color-step-850) on a near-black surface. */
