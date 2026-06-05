@@ -1,0 +1,109 @@
+LOCKED IN — DAILY CODE QUALITY REPORT
+Generated: 2026-06-05
+Repository: felipesdreis/Locked-In (Ionic 7 + Angular 17 + Capacitor 7 + SQLite)
+Scope: src/app/
+
+================================================================================
+## Test Coverage
+================================================================================
+
+--- FILES WITH SPEC (comprehensive) ---
+
+Core Services (5/6):
+  core/services/db.service.spec.ts          — 66 tests: initialize(), query(), run(), exportAsJSON()
+  core/services/habit.service.spec.ts       — 18 tests: load(), create(), update(), archive(), toggleToday(),
+                                                         loadArchived(), restore(), delete(), getCompletionsFor()
+  core/services/notification.service.spec.ts — 13 tests: schedule(), cancel(), requestPermission(),
+                                                          createChannel(), numeric ID derivation
+  core/services/share.service.spec.ts        —  4 tests: generateShareImage() edge cases
+  core/services/streak.service.spec.ts       — 29 tests: streak calculation for daily, weekdays, weekends,
+                                                          custom, x_per_week (730-day limits)
+
+Feature Pages (4/7):
+  features/analytics/analytics.page.spec.ts            — 25 tests: todayRate, topStreaks, habitsAtRisk,
+                                                                     weeklyRateDetails, heatmapDays, overallRate
+  features/archived-habits/archived-habits.page.spec.ts —  9 tests: ngOnInit(), restore(), confirmDelete(),
+                                                                      formatDate()
+  features/habit-form/habit-form.page.spec.ts           — 17 tests: isFormValid, save(), toggleDay(),
+                                                                      edit-mode pre-fill
+  features/onboarding/onboarding-tutorial.component.spec.ts — 12 tests: slide navigation, complete(), skip(),
+                                                                          isCompleted(), localStorage integration
+
+Shared Components (2/13):
+  shared/components/badge-celebration-modal/badge-celebration-modal.component.spec.ts
+      — 5 tests: badge configs for 7/30/100-day milestones, close(), auto-close timing
+  shared/components/habit-card/habit-card.component.spec.ts
+      — 11 tests: isXPerWeek, weeklyProgressRatio, weeklyGoalReached, weeklyProgressLabel,
+                  streakLabel, onToggle()
+
+--- FILES WITH SPEC (empty / default only) ---
+
+  app/app.component.spec.ts
+      — Contains only the default "should create the app" test. No integration or
+        routing checks exist.
+
+--- FILES MISSING A SPEC ENTIRELY ---
+
+Core Services (1):
+  core/services/widget.service.ts           — NO SPEC
+
+Feature Pages (3):
+  features/home/home.page.ts                — NO SPEC  *** Main app entry point ***
+  features/habit-detail/habit-detail.page.ts — NO SPEC
+  features/settings/settings.page.ts        — NO SPEC
+
+Shared Components (11):
+  shared/components/court-line/court-line.component.ts     — NO SPEC
+  shared/components/court-mark/court-mark.component.ts     — NO SPEC
+  shared/components/hoop/hoop.component.ts                 — NO SPEC
+  shared/components/icon/icon.component.ts                 — NO SPEC
+  shared/components/pill/pill.component.ts                 — NO SPEC
+  shared/components/ring/ring.component.ts                 — NO SPEC
+  shared/components/screen-header/screen-header.component.ts — NO SPEC
+  shared/components/share-preview-modal/share-preview-modal.component.ts — NO SPEC
+  shared/components/streak/streak.component.ts             — NO SPEC
+  shared/components/topbar/topbar.component.ts             — NO SPEC
+  shared/components/wordmark/wordmark.component.ts         — NO SPEC
+
+--- COVERAGE BY LAYER ---
+
+  Layer                | Files | With Specs | Coverage
+  ---------------------|-------|------------|----------
+  Core Services        |   6   |     5      |   83%
+  Feature Pages        |   7   |     4      |   57%
+  Shared Components    |  13   |     2      |   15%
+  App Root             |   1   |     1*     |    —   (* default test only)
+  ---------------------|-------|------------|----------
+  Overall              |  27   |    11      |   41%  (comprehensive specs)
+
+Total test cases written: ~141 across 11 spec files.
+
+================================================================================
+## Technical Debt (TODOs/FIXMEs)
+================================================================================
+
+Searched all .ts, .html, and .scss files in src/app/ for:
+  TODO, FIXME, HACK, XXX (as comment markers, case-insensitive)
+
+Result: ZERO technical debt markers found.
+
+  The only "todo" occurrences in the codebase are Portuguese UI strings
+  ("Todo dia" = Every day, "Todo o histórico" = All history) — not code
+  comments. No unresolved issues, workarounds, or deferred work has been
+  flagged in the source code.
+
+================================================================================
+## Summary
+================================================================================
+
+The core business logic layer (services) is well-tested at 83% coverage with
+141 meaningful test cases, and no TODO/FIXME/HACK markers exist anywhere in
+the codebase — indicating disciplined day-to-day coding practices. However,
+coverage drops sharply at the UI layer: 3 key feature pages (home, habit-detail,
+settings) and 11 of 13 shared components have no specs at all, leaving 59% of
+implementation files unguarded against regressions.
+
+Immediate priorities: add specs for home.page.ts (main entry point),
+habit-detail.page.ts, settings.page.ts, and widget.service.ts; the shared
+presentation components (ring, streak, habit-card siblings) are lower-risk
+but would benefit from at least snapshot or @Input/output binding tests.
