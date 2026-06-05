@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
-import { IonContent } from '@ionic/angular/standalone';
+import { IonContent, AlertController } from '@ionic/angular/standalone';
 import { HabitService } from '../../core/services/habit.service';
 import { FrequencyType } from '../../core/models/habit.model';
 import { ScreenHeaderComponent } from '../../shared/components/screen-header/screen-header.component';
@@ -71,6 +71,7 @@ export class HabitFormPage implements OnInit {
     private habitService: HabitService,
     private route: ActivatedRoute,
     private router: Router,
+    private alert: AlertController,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -192,7 +193,18 @@ export class HabitFormPage implements OnInit {
   }
 
   async onDelete(): Promise<void> {
-    if (this.editId && confirm(`Excluir "${this.form.get('name')?.value}"? Todo o histórico será perdido. Sem volta.`)) {
+    if (!this.editId) return;
+    const dialogRef = await this.alert.create({
+      header: 'Excluir hábito?',
+      message: `"${this.form.get('name')?.value}" será removido permanentemente. Todo o histórico será perdido.`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        { text: 'Excluir', role: 'destructive' },
+      ],
+    });
+    await dialogRef.present();
+    const { role } = await dialogRef.onDidDismiss();
+    if (role !== 'cancel') {
       await this.habitService.delete(this.editId);
       await this.router.navigateByUrl('/home');
     }

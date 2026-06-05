@@ -1,0 +1,16 @@
+@if (show) {
+  <div class="celebration-overlay" (click)="close()">
+    <div class="celebration-card" (click)="$event.stopPropagation()">
+      <div class="celebration-canvas-wrap">
+        @if (showFallback) {
+          <div class="celebration-fallback">🏀</div>
+        } @else {
+          <canvas #threeCanvas width="300" height="260"></canvas>
+        }
+      </div>
+      <h2 class="celebration-title">DIA VENCIDO!</h2>
+      <p class="celebration-message">Todos os hábitos completados.<br>Você está Locked In.</p>
+      <button class="celebration-btn" (click)="close()">OK</button>
+    </div>
+  </div>
+}

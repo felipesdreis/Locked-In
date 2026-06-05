@@ -38,9 +38,10 @@ export class AnalyticsPage implements OnInit {
   );
 
   readonly todayRate = computed(() => {
-    const all = this.habits();
-    if (!all.length) return 0;
-    return Math.round((this.completedTodayCount() / all.length) * 100);
+    const today = new Date();
+    const scheduled = this.habits().filter(h => this.habitService.isScheduledForDay(h, today));
+    if (!scheduled.length) return 0;
+    return Math.round((scheduled.filter(h => h.completedToday).length / scheduled.length) * 100);
   });
 
   readonly topStreaks = computed(() =>

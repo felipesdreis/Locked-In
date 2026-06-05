@@ -2,8 +2,8 @@
 <resources>
     <string name="app_name">Locked In</string>
     <string name="title_activity_main">Locked In</string>
-    <string name="package_name">com.lockedin.app</string>
-    <string name="custom_url_scheme">com.lockedin.app</string>
+    <string name="package_name">br.fdrapps.lockedin</string>
+    <string name="custom_url_scheme">br.fdrapps.lockedin</string>
     <string name="widget_description">Shot Clock — hábitos pendentes de hoje</string>
     <string name="widget_4x2_description">Placar do Jogo — pendentes + lista de hábitos</string>
 </resources>

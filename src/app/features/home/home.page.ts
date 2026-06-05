@@ -6,6 +6,7 @@ import { HabitService, BadgeMilestone } from '../../core/services/habit.service'
 import { HabitWithStreak } from '../../core/models/habit.model';
 import { OnboardingTutorialComponent, ONBOARDING_DONE_KEY } from '../onboarding/onboarding-tutorial.component';
 import { BadgeCelebrationModalComponent } from '../../shared/components/badge-celebration-modal/badge-celebration-modal.component';
+import { DailyCelebrationModalComponent } from '../../shared/components/daily-celebration-modal/daily-celebration-modal.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { CourtMarkComponent } from '../../shared/components/court-mark/court-mark.component';
 import { RingComponent } from '../../shared/components/ring/ring.component';
@@ -31,6 +32,7 @@ import { IconComponent } from '../../shared/components/icon/icon.component';
     IconComponent,
     OnboardingTutorialComponent,
     BadgeCelebrationModalComponent,
+    DailyCelebrationModalComponent,
   ],
   templateUrl: './home.page.html',
   styleUrl: './home.page.scss',
@@ -38,6 +40,7 @@ import { IconComponent } from '../../shared/components/icon/icon.component';
 export class HomePage implements OnInit, OnDestroy {
   readonly showOnboarding = signal(false);
   readonly activeBadge = signal<BadgeMilestone | null>(null);
+  readonly showCelebration = signal(false);
 
   // Incomplete habits first, then sorted by streak descending within each group
   readonly habits = computed(() =>
@@ -112,10 +115,18 @@ export class HomePage implements OnInit, OnDestroy {
     if (milestone) {
       this.activeBadge.set(milestone);
     }
+    const total = this.totalHabits();
+    if (total > 0 && this.completedToday() === total) {
+      this.showCelebration.set(true);
+    }
   }
 
   onBadgeClosed(): void {
     this.activeBadge.set(null);
+  }
+
+  onCelebrationClosed(): void {
+    this.showCelebration.set(false);
   }
 
   openHowItWorks(): void {

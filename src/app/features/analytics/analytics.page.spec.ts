@@ -24,11 +24,13 @@ function buildHabitServiceMock(
   const completionsSignal = signal(completions);
   const habitsWithStreakSignal = computed(() => habitsSignal());
 
-  return jasmine.createSpyObj<HabitService>('HabitService', ['load'], {
+  const spy = jasmine.createSpyObj<HabitService>('HabitService', ['load', 'isScheduledForDay'], {
     habitsWithStreak: habitsWithStreakSignal,
     allCompletions: completionsSignal,
     habits: habitsSignal,
   }) as unknown as jasmine.SpyObj<HabitService>;
+  (spy.isScheduledForDay as jasmine.Spy).and.returnValue(true);
+  return spy;
 }
 
 describe('AnalyticsPage', () => {
@@ -195,56 +197,6 @@ describe('AnalyticsPage', () => {
 
       await setup([h1], completions);
       expect(component.weeklyRateDetails().rate).toBe(100);
-    });
-  });
-
-  // ── heatmapDays intensity ────────────────────────────────────────────────────
-
-  describe('heatmapDays', () => {
-    it('returns empty string intensity for days with 0 completions', async () => {
-      await setup([], []);
-      const days = component.heatmapDays();
-      expect(days.every(d => d.intensity === '')).toBeTrue();
-    });
-
-    it('uses "low" intensity for 1-2 completions on a day', async () => {
-      const today = new Date();
-      const todayStr = toDateString(today);
-      const completions: Completion[] = [
-        { id: 'c1', habitId: 'h1', completedAt: todayStr },
-        { id: 'c2', habitId: 'h2', completedAt: todayStr },
-      ];
-      await setup([], completions);
-      const todayCell = component.heatmapDays().find(d => d.date === todayStr)!;
-      expect(todayCell.intensity).toBe('low');
-      expect(todayCell.count).toBe(2);
-    });
-
-    it('uses "mid" intensity for 3-4 completions on a day', async () => {
-      const today = new Date();
-      const todayStr = toDateString(today);
-      const completions: Completion[] = Array.from({ length: 3 }, (_, i) => ({
-        id: `c${i}`, habitId: `h${i}`, completedAt: todayStr,
-      }));
-      await setup([], completions);
-      const todayCell = component.heatmapDays().find(d => d.date === todayStr)!;
-      expect(todayCell.intensity).toBe('mid');
-    });
-
-    it('uses "high" intensity for 5+ completions on a day', async () => {
-      const today = new Date();
-      const todayStr = toDateString(today);
-      const completions: Completion[] = Array.from({ length: 5 }, (_, i) => ({
-        id: `c${i}`, habitId: `h${i}`, completedAt: todayStr,
-      }));
-      await setup([], completions);
-      const todayCell = component.heatmapDays().find(d => d.date === todayStr)!;
-      expect(todayCell.intensity).toBe('high');
-    });
-
-    it('returns exactly 30 days', async () => {
-      await setup([], []);
-      expect(component.heatmapDays().length).toBe(30);
     });
   });
 

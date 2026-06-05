@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.lockedin.app"
+    namespace "br.fdrapps.lockedin"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.lockedin.app"
+        applicationId "br.fdrapps.lockedin"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 5
@@ -16,10 +16,19 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            storeFile file("C:/Users/Felipe Reis/Documents/GitHub/Locked-In/lockedin.keystore")
+            storePassword "211996"
+            keyAlias "lockedin"
+            keyPassword "211996"
+        }
+    }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 }

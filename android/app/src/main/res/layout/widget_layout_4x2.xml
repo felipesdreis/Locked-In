@@ -10,6 +10,7 @@
 
     <!-- LOCKED IN wordmark — alpha baked into textColor (#B2 = 70% opacity) -->
     <TextView
+        android:id="@+id/widget_4x2_wordmark"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="LOCKED IN"

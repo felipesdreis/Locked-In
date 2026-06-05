@@ -199,38 +199,6 @@ form {
   }
 }
 
-/* DECORATIVE BANNER */
-.banner {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  background: var(--asphalt);
-  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
-  border-radius: 14px;
-
-  .banner-hoop {
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    border: 2px solid var(--accent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 20px -8px var(--accent);
-    flex-shrink: 0;
-    color: var(--accent);
-  }
-
-  .banner-text {
-    font-family: var(--ui);
-    font-size: 14px;
-    color: var(--muted);
-    line-height: 1.4;
-    font-weight: 500;
-  }
-}
-
 /* PRIMARY BUTTON */
 .btn-primary {
   margin-top: 8px;

@@ -77,13 +77,6 @@ export class DbService {
     }
   }
 
-  async runTransaction(statements: { sql: string; values?: unknown[] }[]): Promise<void> {
-    await this.db.executeSet(statements.map(s => ({ statement: s.sql, values: s.values ?? [] })));
-    if (Capacitor.getPlatform() === 'web') {
-      await this.sqlite.saveToStore(DB_NAME);
-    }
-  }
-
   async exportAsJSON(): Promise<Blob> {
     const habits = await this.query<Record<string, string>>('SELECT * FROM habits ORDER BY created_at ASC');
     const completions = await this.query<Record<string, string>>('SELECT * FROM completions ORDER BY completed_at ASC');

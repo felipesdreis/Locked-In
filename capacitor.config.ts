@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.lockedin.app',
+  appId: 'br.fdrapps.lockedin',
   appName: 'Locked In',
   webDir: 'dist/locked-in/browser',
   plugins: {

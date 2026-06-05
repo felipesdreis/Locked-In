@@ -35,7 +35,7 @@ describe('NotificationService', () => {
 
   describe('numeric id derivation', () => {
     it('produces a positive integer id for a given UUID', async () => {
-      await service.schedule({ id: '550e8400-e29b-41d4-a716-446655440000', name: 'Test', reminderTime: '09:00' });
+      await service.schedule({ id: '550e8400-e29b-41d4-a716-446655440000', name: 'Test', reminderTime: '09:00', frequencyType: 'daily', frequencyDays: [] });
 
       const notifId: number = plugin.schedule.calls.first().args[0].notifications[0].id;
       expect(Number.isInteger(notifId)).toBeTrue();
@@ -44,21 +44,21 @@ describe('NotificationService', () => {
 
     it('produces the same id for the same UUID on every call', async () => {
       const uuid = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
-      await service.schedule({ id: uuid, name: 'Stable', reminderTime: '10:00' });
+      await service.schedule({ id: uuid, name: 'Stable', reminderTime: '10:00', frequencyType: 'daily', frequencyDays: [] });
       const firstId: number = plugin.schedule.calls.first().args[0].notifications[0].id;
 
       plugin.schedule.calls.reset();
-      await service.schedule({ id: uuid, name: 'Stable', reminderTime: '10:00' });
+      await service.schedule({ id: uuid, name: 'Stable', reminderTime: '10:00', frequencyType: 'daily', frequencyDays: [] });
       const secondId: number = plugin.schedule.calls.first().args[0].notifications[0].id;
 
       expect(firstId).toBe(secondId);
     });
 
     it('produces different ids for different UUIDs', async () => {
-      await service.schedule({ id: '11111111-0000-0000-0000-000000000000', name: 'A', reminderTime: '06:00' });
+      await service.schedule({ id: '11111111-0000-0000-0000-000000000000', name: 'A', reminderTime: '06:00', frequencyType: 'daily', frequencyDays: [] });
       const id1: number = plugin.schedule.calls.mostRecent().args[0].notifications[0].id;
 
-      await service.schedule({ id: '22222222-0000-0000-0000-000000000000', name: 'B', reminderTime: '06:00' });
+      await service.schedule({ id: '22222222-0000-0000-0000-000000000000', name: 'B', reminderTime: '06:00', frequencyType: 'daily', frequencyDays: [] });
       const id2: number = plugin.schedule.calls.mostRecent().args[0].notifications[0].id;
 
       expect(id1).not.toBe(id2);
@@ -66,7 +66,7 @@ describe('NotificationService', () => {
 
     it('cancel uses the same id derivation as schedule', async () => {
       const uuid = '99999999-0000-0000-0000-000000000000';
-      await service.schedule({ id: uuid, name: 'Match', reminderTime: '07:30' });
+      await service.schedule({ id: uuid, name: 'Match', reminderTime: '07:30', frequencyType: 'daily', frequencyDays: [] });
       const scheduledId: number = plugin.schedule.calls.first().args[0].notifications[0].id;
 
       await service.cancel(uuid);
@@ -80,7 +80,7 @@ describe('NotificationService', () => {
 
   describe('schedule()', () => {
     it('schedules a notification with the correct hour and minute', async () => {
-      await service.schedule({ id: 'abc-123', name: 'Drink water', reminderTime: '14:30' });
+      await service.schedule({ id: 'abc-123', name: 'Drink water', reminderTime: '14:30', frequencyType: 'daily', frequencyDays: [] });
 
       expect(plugin.schedule).toHaveBeenCalledTimes(1);
       const { hour, minute } = plugin.schedule.calls.first().args[0].notifications[0].schedule.on;
@@ -89,14 +89,14 @@ describe('NotificationService', () => {
     });
 
     it('uses the habit name in the notification body', async () => {
-      await service.schedule({ id: 'xyz', name: 'Meditate', reminderTime: '06:00' });
+      await service.schedule({ id: 'xyz', name: 'Meditate', reminderTime: '06:00', frequencyType: 'daily', frequencyDays: [] });
 
       const body: string = plugin.schedule.calls.first().args[0].notifications[0].body;
       expect(body).toContain('Meditate');
     });
 
     it('targets the reminders channel', async () => {
-      await service.schedule({ id: 'ch-test', name: 'Run', reminderTime: '07:00' });
+      await service.schedule({ id: 'ch-test', name: 'Run', reminderTime: '07:00', frequencyType: 'daily', frequencyDays: [] });
 
       const channelId: string = plugin.schedule.calls.first().args[0].notifications[0].channelId;
       expect(channelId).toBe('reminders');
@@ -111,7 +111,7 @@ describe('NotificationService', () => {
 
       expect(plugin.cancel).toHaveBeenCalledTimes(1);
       const notifications: Array<{ id: number }> = plugin.cancel.calls.first().args[0].notifications;
-      expect(notifications.length).toBe(1);
+      expect(notifications.length).toBe(8);
       expect(typeof notifications[0].id).toBe('number');
     });
   });
