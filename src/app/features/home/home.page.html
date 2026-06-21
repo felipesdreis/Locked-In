@@ -1,6 +1,14 @@
 <app-topbar></app-topbar>
 
 <ion-content [scrollY]="true">
+  <!-- BANNER: MODO ONTEM -->
+  <div class="yesterday-banner" *ngIf="viewingYesterday()">
+    <span class="yesterday-banner-label">EDITANDO · {{ yesterdayFormatted() }}</span>
+    <button class="yesterday-banner-exit" (click)="exitYesterdayMode()" type="button">
+      Voltar a Hoje
+    </button>
+  </div>
+
   <!-- HERO CARD: SCOREBOARD -->
   <section class="hero-card scoreboard">
     <app-court-mark opacity="calc(var(--court-strength) * 2.4)"></app-court-mark>
@@ -9,8 +17,8 @@
       <!-- Left: Ring de progresso -->
       <div class="ring-col">
         <app-ring
-          [done]="completedToday()"
-          [total]="totalHabits()"
+          [done]="displayCompleted()"
+          [total]="displayTotal()"
           [size]="92"
           [strokeWidth]="7"
         ></app-ring>
@@ -18,11 +26,11 @@
 
       <!-- Right: Métricas -->
       <div class="metrics-col">
-        <div class="date-label">{{ todayFormatted() }}</div>
+        <div class="date-label">{{ displayDateLabel() }}</div>
         <div class="percentage-display">
-          <span class="pct-number">{{ percentageToday() }}</span><span class="pct-symbol">%</span>
+          <span class="pct-number">{{ displayPercentage() }}</span><span class="pct-symbol">%</span>
         </div>
-        <div class="locked-in-label">LOCKED IN HOJE</div>
+        <div class="locked-in-label">{{ displayLockedLabel() }}</div>
 
         <div class="pill-wrapper" *ngIf="bestStreak() > 0">
           <app-pill label="MELHOR STREAK">
@@ -37,13 +45,21 @@
   <section class="habits-section">
     <div class="section-header">
       <h2 class="section-title">A QUADRA</h2>
-      <div class="section-counter">{{ completedToday() }}/{{ totalHabits() }} CONVERTIDOS</div>
+      <div class="section-counter">{{ displayCompleted() }}/{{ displayTotal() }} CONVERTIDOS</div>
+    </div>
+
+    <!-- Botão para entrar no modo ontem -->
+    <div class="yesterday-entry" *ngIf="!viewingYesterday()">
+      <button class="yesterday-btn" (click)="enterYesterdayMode()" type="button">
+        <app-icon name="clock" [size]="14" [stroke]="2"></app-icon>
+        Marcar hábitos de ontem
+      </button>
     </div>
 
     <!-- List with habits -->
-    <div class="habits-list" *ngIf="totalHabits() > 0">
+    <div class="habits-list" *ngIf="displayTotal() > 0">
       <div
-        *ngFor="let habit of habits()"
+        *ngFor="let habit of displayHabits()"
         class="habit-row"
         [class.completed]="habit.completedToday"
       >
@@ -74,17 +90,24 @@
         <div class="habit-toggle">
           <app-hoop
             [checked]="habit.completedToday"
-            (change)="toggleHabit(habit.id)"
+            (change)="onToggle(habit.id)"
           ></app-hoop>
         </div>
       </div>
     </div>
 
     <!-- Empty state -->
-    <div class="empty-state" *ngIf="totalHabits() === 0">
+    <div class="empty-state" *ngIf="displayTotal() === 0 && !viewingYesterday()">
       <app-icon name="hoop" [size]="52" color="var(--faint)"></app-icon>
       <p class="empty-title">QUADRA VAZIA</p>
       <p class="empty-subtitle">Toque no + para criar o seu primeiro hábito.</p>
+    </div>
+
+    <!-- Empty state: modo ontem sem hábitos agendados -->
+    <div class="empty-state" *ngIf="displayTotal() === 0 && viewingYesterday()">
+      <app-icon name="clock" [size]="52" color="var(--faint)"></app-icon>
+      <p class="empty-title">SEM HÁBITOS ONTEM</p>
+      <p class="empty-subtitle">Nenhum hábito estava agendado para ontem.</p>
     </div>
   </section>
 

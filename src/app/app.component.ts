@@ -5,6 +5,7 @@ import { Platform, NavController } from '@ionic/angular';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { NotificationService } from './core/services/notification.service';
+import { toDateString } from './core/utils/date.util';
 
 @Component({
   selector: 'app-root',
@@ -28,7 +29,11 @@ export class AppComponent implements OnInit {
     }
 
     // Platform must be ready before back button events fire on native.
-    this.platform.ready().then(() => this.registerBackButton());
+    this.platform.ready().then(() => {
+      this.registerBackButton();
+      this.rescheduleReminderIfNeeded();
+      App.addListener('resume', () => this.rescheduleReminderIfNeeded());
+    });
   }
 
   // Priority 10 is below Ionic overlays (modals, alerts use higher priorities),
@@ -41,6 +46,18 @@ export class AppComponent implements OnInit {
         this.navController.back();
       }
     });
+  }
+
+  private async rescheduleReminderIfNeeded(): Promise<void> {
+    try {
+      if (localStorage.getItem('daily_reminder_enabled') !== 'true') return;
+      const suppressed = localStorage.getItem('daily_reminder_suppressed_date');
+      if (suppressed === toDateString(new Date())) return;
+      const time = localStorage.getItem('daily_reminder_time') ?? '21:00';
+      await this.notifications.scheduleDailyReminder(time);
+    } catch (e) {
+      console.error('[AppComponent] rescheduleReminderIfNeeded failed', e);
+    }
   }
 
   private initDarkMode(): void {

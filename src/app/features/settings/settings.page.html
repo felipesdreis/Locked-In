@@ -25,6 +25,40 @@
       </div>
     </section>
 
+    <!-- GRUPO: LEMBRETE DIÁRIO -->
+    <section class="settings-group">
+      <h3 class="group-label">LEMBRETE DIÁRIO</h3>
+      <div class="settings-card">
+        <div class="settings-row no-chevron">
+          <div class="row-icon">
+            <app-icon name="clock" [size]="22"></app-icon>
+          </div>
+          <div class="row-content">
+            <div class="row-title">Lembrete Diário</div>
+            <div class="row-subtitle">Lembrar de verificar seus hábitos</div>
+          </div>
+          <ion-toggle
+            [checked]="dailyReminderEnabled()"
+            (ionChange)="onReminderToggle($event)"
+            aria-label="Ativar lembrete diário"
+          ></ion-toggle>
+        </div>
+        <div class="row-divider" *ngIf="dailyReminderEnabled()"></div>
+        <div class="settings-row no-chevron reminder-time-row" *ngIf="dailyReminderEnabled()">
+          <div class="row-content">
+            <div class="row-title">Horário</div>
+          </div>
+          <input
+            type="time"
+            class="time-input"
+            [value]="dailyReminderTime()"
+            (change)="onReminderTimeChange($event)"
+            aria-label="Horário do lembrete diário"
+          />
+        </div>
+      </div>
+    </section>
+
     <!-- GRUPO: SOBRE -->
     <section class="settings-group">
       <h3 class="group-label">SOBRE O APP</h3>

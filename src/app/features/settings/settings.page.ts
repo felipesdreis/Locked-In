@@ -3,12 +3,17 @@ import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { NgIf } from '@angular/common';
-import { IonContent } from '@ionic/angular/standalone';
+import { IonContent, IonToggle, AlertController } from '@ionic/angular/standalone';
 import { DbService } from '../../core/services/db.service';
+import { NotificationService } from '../../core/services/notification.service';
 import { ScreenHeaderComponent } from '../../shared/components/screen-header/screen-header.component';
 import { CourtMarkComponent } from '../../shared/components/court-mark/court-mark.component';
 import { WordmarkComponent } from '../../shared/components/wordmark/wordmark.component';
 import { IconComponent } from '../../shared/components/icon/icon.component';
+
+const REMINDER_ENABLED_KEY = 'daily_reminder_enabled';
+const REMINDER_TIME_KEY = 'daily_reminder_time';
+const REMINDER_SUPPRESSED_KEY = 'daily_reminder_suppressed_date';
 
 @Component({
   selector: 'app-settings',
@@ -16,6 +21,7 @@ import { IconComponent } from '../../shared/components/icon/icon.component';
   imports: [
     NgIf,
     IonContent,
+    IonToggle,
     ScreenHeaderComponent,
     CourtMarkComponent,
     WordmarkComponent,
@@ -27,8 +33,54 @@ import { IconComponent } from '../../shared/components/icon/icon.component';
 export class SettingsPage {
   readonly exporting = signal(false);
   readonly appVersion = '3.0.0';
+  readonly dailyReminderEnabled = signal(false);
+  readonly dailyReminderTime = signal('21:00');
 
-  constructor(private db: DbService) {}
+  constructor(
+    private db: DbService,
+    private notifications: NotificationService,
+    private alert: AlertController,
+  ) {
+    this.dailyReminderEnabled.set(localStorage.getItem(REMINDER_ENABLED_KEY) === 'true');
+    this.dailyReminderTime.set(localStorage.getItem(REMINDER_TIME_KEY) ?? '21:00');
+  }
+
+  async onReminderToggle(event: Event): Promise<void> {
+    const enabled = (event as CustomEvent).detail.checked as boolean;
+    if (enabled) {
+      const ok = await this.notifications.scheduleDailyReminder(this.dailyReminderTime());
+      if (!ok) {
+        // Revert toggle — permission was denied
+        this.dailyReminderEnabled.set(false);
+        localStorage.setItem(REMINDER_ENABLED_KEY, 'false');
+        const dialog = await this.alert.create({
+          header: 'Permissão necessária',
+          message: 'Ative as notificações do Locked In nas configurações do dispositivo para usar lembretes.',
+          buttons: [{ text: 'OK', role: 'cancel' }],
+        });
+        await dialog.present();
+        return;
+      }
+      this.dailyReminderEnabled.set(true);
+      localStorage.setItem(REMINDER_ENABLED_KEY, 'true');
+    } else {
+      this.dailyReminderEnabled.set(false);
+      localStorage.setItem(REMINDER_ENABLED_KEY, 'false');
+      localStorage.removeItem(REMINDER_SUPPRESSED_KEY);
+      await this.notifications.cancelDailyReminder();
+    }
+  }
+
+  async onReminderTimeChange(event: Event): Promise<void> {
+    const time = (event.target as HTMLInputElement).value;
+    if (!time) return;
+    this.dailyReminderTime.set(time);
+    localStorage.setItem(REMINDER_TIME_KEY, time);
+    localStorage.removeItem(REMINDER_SUPPRESSED_KEY);
+    if (this.dailyReminderEnabled()) {
+      await this.notifications.scheduleDailyReminder(time);
+    }
+  }
 
   async exportData(): Promise<void> {
     if (this.exporting()) return;

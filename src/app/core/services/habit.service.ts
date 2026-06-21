@@ -117,6 +117,19 @@ export class HabitService {
     await this.load();
   }
 
+  // Toggles a completion for any given date (e.g. yesterday). No badge awarded for past dates.
+  async toggleDay(habitId: string, date: Date): Promise<void> {
+    const dateStr = toDateString(date);
+    const existing = this._completions().find(c => c.habitId === habitId && c.completedAt === dateStr);
+    if (existing) {
+      await this.db.run(`DELETE FROM completions WHERE id=?`, [existing.id]);
+    } else {
+      await this.db.run(`INSERT INTO completions (id, habit_id, completed_at) VALUES (?, ?, ?)`, [crypto.randomUUID(), habitId, dateStr]);
+    }
+    this.widget.requestUpdate();
+    await this.load();
+  }
+
   // Returns a milestone (7, 30, 100) if a new badge was earned, or null.
   async toggleToday(habitId: string): Promise<BadgeMilestone | null> {
     const today = toDateString(new Date());

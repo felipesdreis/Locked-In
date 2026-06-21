@@ -95,6 +95,47 @@
   }
 }
 
+.no-chevron {
+  cursor: default;
+  &:hover { background: transparent; }
+  &:active { background: transparent; }
+}
+
+.reminder-time-row {
+  padding-left: 24px;
+
+  .row-content .row-title {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+}
+
+.time-input {
+  background: var(--asphalt-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--white);
+  font-family: var(--ui);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 6px 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.6;
+  }
+}
+
+ion-toggle {
+  --track-background: var(--asphalt-2);
+  --track-background-checked: var(--accent);
+  --handle-background: var(--white);
+  flex-shrink: 0;
+}
+
 /* ABOUT CARD */
 .about-card {
   background: var(--asphalt);

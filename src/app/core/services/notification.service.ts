@@ -84,6 +84,32 @@ export class NotificationService {
     await this.plugin.cancel({ notifications: ids });
   }
 
+  // Fixed ID for the global daily check-in reminder.
+  // -1 is used because Math.abs(djb2) always returns ≥ 0, so -1 can never collide with habit IDs.
+  private readonly DAILY_ID = -1;
+
+  // Returns true if the notification was successfully scheduled, false if permission was denied.
+  async scheduleDailyReminder(time: string): Promise<boolean> {
+    const granted = await this.requestPermission();
+    if (!granted) return false;
+    const [hours, minutes] = time.split(':').map(Number);
+    await this.plugin.cancel({ notifications: [{ id: this.DAILY_ID }] });
+    await this.plugin.schedule({
+      notifications: [{
+        id: this.DAILY_ID,
+        title: 'Locked In',
+        body: 'Já completou os hábitos de Hoje?',
+        schedule: { on: { hour: hours, minute: minutes }, allowWhileIdle: true },
+        channelId: 'reminders',
+      }],
+    });
+    return true;
+  }
+
+  async cancelDailyReminder(): Promise<void> {
+    await this.plugin.cancel({ notifications: [{ id: this.DAILY_ID }] });
+  }
+
   async createChannel(): Promise<void> {
     await this.plugin.createChannel({
       id: 'reminders',
