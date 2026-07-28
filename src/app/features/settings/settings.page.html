@@ -73,17 +73,21 @@
       </div>
     </section>
 
-    <!-- GRUPO: FEEDBACK -->
+    <!-- GRUPO: AVALIAÇÕES -->
     <section class="settings-group">
-      <h3 class="group-label">FEEDBACK</h3>
+      <h3 class="group-label">AVALIAÇÕES</h3>
       <div class="settings-card">
-        <button class="settings-row" (click)="openFeedback()" type="button">
+        <button
+          class="settings-row"
+          (click)="openLink('https://play.google.com/store/apps/details?id=br.fdrapps.lockedin&hl=pt_BR')"
+          type="button"
+        >
           <div class="row-icon">
             <app-icon name="edit" [size]="22"></app-icon>
           </div>
           <div class="row-content">
-            <div class="row-title">Enviar Feedback</div>
-            <div class="row-subtitle">Encontrou um bug? Tem sugestão?</div>
+            <div class="row-title">Avaliar o App</div>
+            <div class="row-subtitle">Deixe sua avaliação na Play Store</div>
           </div>
           <app-icon name="chevR" [size]="18" color="var(--faint)"></app-icon>
         </button>
@@ -94,24 +98,32 @@
     <section class="settings-group">
       <h3 class="group-label">LINKS</h3>
       <div class="settings-card">
-        <button class="settings-row tbd" disabled type="button">
+        <button
+          class="settings-row"
+          (click)="openLink('https://www.felipedosreis.com.br/locked-in#download')"
+          type="button"
+        >
           <div class="row-icon">
             <app-icon name="target" [size]="22"></app-icon>
           </div>
           <div class="row-content">
             <div class="row-title">Site Oficial</div>
-            <div class="row-subtitle">Em breve</div>
+            <div class="row-subtitle">Conheça o app</div>
           </div>
           <app-icon name="chevR" [size]="18" color="var(--faint)"></app-icon>
         </button>
         <div class="row-divider"></div>
-        <button class="settings-row tbd" disabled type="button">
+        <button
+          class="settings-row"
+          (click)="openLink('https://play.google.com/store/apps/details?id=br.fdrapps.lockedin&hl=pt_BR')"
+          type="button"
+        >
           <div class="row-icon">
             <app-icon name="hoop" [size]="22"></app-icon>
           </div>
           <div class="row-content">
             <div class="row-title">Avaliar na Play Store</div>
-            <div class="row-subtitle">Em breve</div>
+            <div class="row-subtitle">Deixe sua avaliação</div>
           </div>
           <app-icon name="chevR" [size]="18" color="var(--faint)"></app-icon>
         </button>
