@@ -231,6 +231,126 @@ describe('HabitService', () => {
       await service.toggleToday('h1');
       expect(dbMock.query.calls.count()).toBeGreaterThan(queryCalls);
     });
+
+    it('does not touch notifications when the habit has no reminderTime', async () => {
+      // Default SAMPLE_HABIT_ROW has reminder_time: '' and is completed today
+      await service.load();
+      await service.toggleToday('h1');
+      expect(notifMock.cancel).not.toHaveBeenCalled();
+      expect(notifMock.schedule).not.toHaveBeenCalled();
+    });
+
+    it('cancels the notification when marking a reminder-enabled habit complete', async () => {
+      const habitWithReminder = { ...SAMPLE_HABIT_ROW, reminder_time: '10:00' };
+      dbMock = buildDbMock([habitWithReminder], []); // not completed today
+      notifMock = buildNotificationMock();
+      notifMock.schedule.and.resolveTo(undefined);
+      notifMock.cancel.and.resolveTo(undefined);
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        providers: [
+          HabitService,
+          StreakService,
+          { provide: DbService, useValue: dbMock },
+          { provide: NotificationService, useValue: notifMock },
+        ],
+      });
+      service = TestBed.inject(HabitService);
+      await service.load();
+
+      await service.toggleToday('h1');
+
+      expect(notifMock.cancel).toHaveBeenCalledWith('h1');
+      expect(notifMock.schedule).not.toHaveBeenCalled();
+    });
+
+    it('reschedules the notification when undoing completion of a reminder-enabled habit', async () => {
+      const habitWithReminder = { ...SAMPLE_HABIT_ROW, reminder_time: '10:00' };
+      dbMock = buildDbMock([habitWithReminder], [SAMPLE_COMPLETION_ROW]); // completed today
+      notifMock = buildNotificationMock();
+      notifMock.schedule.and.resolveTo(undefined);
+      notifMock.cancel.and.resolveTo(undefined);
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        providers: [
+          HabitService,
+          StreakService,
+          { provide: DbService, useValue: dbMock },
+          { provide: NotificationService, useValue: notifMock },
+        ],
+      });
+      service = TestBed.inject(HabitService);
+      await service.load();
+
+      await service.toggleToday('h1');
+
+      expect(notifMock.schedule).toHaveBeenCalledWith(
+        jasmine.objectContaining({ id: 'h1', reminderTime: '10:00' }),
+      );
+      expect(notifMock.cancel).not.toHaveBeenCalled();
+    });
+  });
+
+  // ── syncNotifications ────────────────────────────────────────────────────────
+
+  describe('syncNotifications()', () => {
+    it('cancels reminders for habits already completed today', async () => {
+      const habitWithReminder = { ...SAMPLE_HABIT_ROW, reminder_time: '10:00' };
+      dbMock = buildDbMock([habitWithReminder], [SAMPLE_COMPLETION_ROW]); // completed today
+      notifMock = buildNotificationMock();
+      notifMock.schedule.and.resolveTo(undefined);
+      notifMock.cancel.and.resolveTo(undefined);
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        providers: [
+          HabitService,
+          StreakService,
+          { provide: DbService, useValue: dbMock },
+          { provide: NotificationService, useValue: notifMock },
+        ],
+      });
+      service = TestBed.inject(HabitService);
+      await service.load();
+
+      await service.syncNotifications();
+
+      expect(notifMock.cancel).toHaveBeenCalledWith('h1');
+      expect(notifMock.schedule).not.toHaveBeenCalled();
+    });
+
+    it('reschedules reminders for habits not yet completed today', async () => {
+      const habitWithReminder = { ...SAMPLE_HABIT_ROW, reminder_time: '10:00' };
+      dbMock = buildDbMock([habitWithReminder], []); // not completed today
+      notifMock = buildNotificationMock();
+      notifMock.schedule.and.resolveTo(undefined);
+      notifMock.cancel.and.resolveTo(undefined);
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        providers: [
+          HabitService,
+          StreakService,
+          { provide: DbService, useValue: dbMock },
+          { provide: NotificationService, useValue: notifMock },
+        ],
+      });
+      service = TestBed.inject(HabitService);
+      await service.load();
+
+      await service.syncNotifications();
+
+      expect(notifMock.schedule).toHaveBeenCalledWith(
+        jasmine.objectContaining({ id: 'h1', reminderTime: '10:00' }),
+      );
+      expect(notifMock.cancel).not.toHaveBeenCalled();
+    });
+
+    it('ignores habits without a reminderTime', async () => {
+      // Default SAMPLE_HABIT_ROW has reminder_time: ''
+      await service.load();
+      await service.syncNotifications();
+      expect(notifMock.cancel).not.toHaveBeenCalled();
+      expect(notifMock.schedule).not.toHaveBeenCalled();
+    });
   });
 
   // ── loadArchived ───────────────────────────────────────────────────────────

@@ -16,6 +16,11 @@ export const LOCAL_NOTIFICATIONS = new InjectionToken('LocalNotifications', {
   factory: () => LocalNotifications,
 });
 
+// localStorage keys for the global daily reminder, shared between AppComponent and SettingsPage
+export const REMINDER_ENABLED_KEY = 'daily_reminder_enabled';
+export const REMINDER_TIME_KEY = 'daily_reminder_time';
+export const REMINDER_SUPPRESSED_KEY = 'daily_reminder_suppressed_date';
+
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
   private readonly plugin = inject(LOCAL_NOTIFICATIONS);

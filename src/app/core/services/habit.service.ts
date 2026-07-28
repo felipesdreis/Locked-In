@@ -134,19 +134,42 @@ export class HabitService {
   async toggleToday(habitId: string): Promise<BadgeMilestone | null> {
     const today = toDateString(new Date());
     const existing = this._completions().find(c => c.habitId === habitId && c.completedAt === today);
+    const habit = this._habits().find(h => h.id === habitId);
     if (existing) {
       await this.db.run(`DELETE FROM completions WHERE id=?`, [existing.id]);
       this.widget.requestUpdate();
       await this.load();
+      if (habit?.reminderTime) {
+        await this.notifications.schedule({ id: habitId, name: habit.name, reminderTime: habit.reminderTime, frequencyType: habit.frequencyType, frequencyDays: habit.frequencyDays });
+      }
       return null;
     }
 
     await this.db.run(`INSERT INTO completions (id, habit_id, completed_at) VALUES (?, ?, ?)`, [crypto.randomUUID(), habitId, today]);
     this.widget.requestUpdate();
     await this.load();
+    if (habit?.reminderTime) {
+      await this.notifications.cancel(habitId);
+    }
 
     // Check for milestone badges after loading updated data
     return this.checkAndAwardBadge(habitId);
+  }
+
+  // Re-arms per-habit reminders on a new day: toggleToday() cancels a habit's
+  // notification when completed, which removes the whole recurring alarm —
+  // this restores it once the habit is no longer completed today.
+  async syncNotifications(): Promise<void> {
+    const today = toDateString(new Date());
+    for (const habit of this._habits()) {
+      if (!habit.reminderTime) continue;
+      const completedToday = this._completions().some(c => c.habitId === habit.id && c.completedAt === today);
+      if (completedToday) {
+        await this.notifications.cancel(habit.id);
+      } else {
+        await this.notifications.schedule({ id: habit.id, name: habit.name, reminderTime: habit.reminderTime, frequencyType: habit.frequencyType, frequencyDays: habit.frequencyDays });
+      }
+    }
   }
 
   private async checkAndAwardBadge(habitId: string): Promise<BadgeMilestone | null> {

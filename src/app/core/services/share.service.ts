@@ -35,6 +35,24 @@ export interface ShareDay {
   completed: boolean;
 }
 
+export async function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve((reader.result as string).split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+export function downloadBrowser(blob: Blob, fileName: string): void {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 @Injectable({ providedIn: 'root' })
 export class ShareService {
   async generateShareImage(
@@ -69,7 +87,7 @@ export class ShareService {
     if (Capacitor.isNativePlatform()) {
       await this.shareNative(blob, habitId);
     } else {
-      this.downloadBrowser(blob, habitId);
+      downloadBrowser(blob, `locked-in-${habitId}.png`);
     }
   }
 
@@ -372,29 +390,11 @@ export class ShareService {
   }
 
   private async shareNative(blob: Blob, habitId: string): Promise<void> {
-    const base64 = await this.blobToBase64(blob);
+    const base64 = await blobToBase64(blob);
     const fileName = `locked-in-${habitId}.png`;
     await Filesystem.writeFile({ path: fileName, data: base64, directory: Directory.Cache });
     const { uri } = await Filesystem.getUri({ path: fileName, directory: Directory.Cache });
     await Share.share({ title: 'Minha consistência no Locked In 🔥', files: [uri] });
     await Filesystem.deleteFile({ path: fileName, directory: Directory.Cache }).catch(() => {});
-  }
-
-  private downloadBrowser(blob: Blob, habitId: string): void {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `locked-in-${habitId}.png`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
-
-  private async blobToBase64(blob: Blob): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve((reader.result as string).split(',')[1]);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
   }
 }

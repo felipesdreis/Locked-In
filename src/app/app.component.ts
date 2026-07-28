@@ -5,6 +5,7 @@ import { Platform, NavController } from '@ionic/angular';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { NotificationService } from './core/services/notification.service';
+import { HabitService } from './core/services/habit.service';
 import { toDateString } from './core/utils/date.util';
 
 @Component({
@@ -15,6 +16,7 @@ import { toDateString } from './core/utils/date.util';
 })
 export class AppComponent implements OnInit {
   private readonly notifications = inject(NotificationService);
+  private readonly habitService = inject(HabitService);
   private readonly platform = inject(Platform);
   private readonly navController = inject(NavController);
   private readonly location = inject(Location);
@@ -32,7 +34,11 @@ export class AppComponent implements OnInit {
     this.platform.ready().then(() => {
       this.registerBackButton();
       this.rescheduleReminderIfNeeded();
-      App.addListener('resume', () => this.rescheduleReminderIfNeeded());
+      this.syncHabitNotifications();
+      App.addListener('resume', () => {
+        this.rescheduleReminderIfNeeded();
+        this.syncHabitNotifications();
+      });
     });
   }
 
@@ -57,6 +63,17 @@ export class AppComponent implements OnInit {
       await this.notifications.scheduleDailyReminder(time);
     } catch (e) {
       console.error('[AppComponent] rescheduleReminderIfNeeded failed', e);
+    }
+  }
+
+  // Re-arms per-habit reminders that were canceled by a completion on a
+  // previous day — see HabitService.syncNotifications().
+  private async syncHabitNotifications(): Promise<void> {
+    try {
+      await this.habitService.load();
+      await this.habitService.syncNotifications();
+    } catch (e) {
+      console.error('[AppComponent] syncHabitNotifications failed', e);
     }
   }
 
